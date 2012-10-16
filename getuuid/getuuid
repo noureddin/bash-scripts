@@ -1,7 +1,6 @@
 #!/bin/bash
 #run with 'root' because of `blkid`
 #example: sudo ./getuuid /dev/sda1
-#you can change filename `uuids` in the next two lines and the last
 a=`blkid $@`
 echo $a | sed 's/.*UUID="\([^"]\+\)".*/\1/'
 #You can replace UUID with TYPE or LABEL
