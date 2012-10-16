@@ -1,6 +1,0 @@
-#!/bin/bash
-#run with 'root' because of `blkid`
-#example: sudo ./gettype /dev/sda1
-a=`blkid $@`
-echo $a | sed 's/.*TYPE="\([^"]\+\)".*/\1/'
-
