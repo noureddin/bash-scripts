@@ -1,0 +1,73 @@
+#!/bin/bash
+#Install by "sudo cp modblock /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
+
+if [ "$1" != "b" -o "$1" != "block" -o "$1" != "a" -o "$1" != "allow" -o "$1" != "l" -o "$1" != "list" ]
+then
+	echo '''
+	Kernel Module Blocker for Unix-like systems (Now Debian Only)
+	 You can use this script to block any kernel module.
+	 It -Simply- add it to the blacklist, And removes it when you "allow".
+	 Usage:
+		b, block [mod] #to block any module
+		a, allow [mod] #to allow any blocked module
+		l, list        #to list all "Modules on System" and "Blocked Modules"
+		l, list line   #to list all "Modules on System" and "Blocked Modules" one per line
+		any thing else #to show this help ;)		
+	'''	
+fi
+
+blst='/etc/modprobe.d/blacklist'
+
+if [ "$1" == "l" -o "$1" == "list" ]
+then
+	modsys=`lsmod|sed 's/[ ].*//'`
+	blkmod=`cat $blst|sed 's/.*[ ]/(&)/'`
+	echo "Modules on System:"
+	if [ "$2" == "line" ];then
+		for i in $modsys;do echo $i;done
+	else
+		echo $modsys
+	fi
+	
+	echo "Blocked Modules"
+	if [ "$blkmod" == "" ]
+	then
+		echo "  No modules were blocked"
+	else
+		if [ "$2" == "line" ];then
+			for i in $blkmod;do echo $i;done
+		else
+			echo $blkmod
+		fi
+	fi
+else
+	arr=( $@ )
+	for a in ${arr[@]:1}
+	do		
+		inbls=`cat $blst|grep $a` #In Blacklist
+		found=`lsmod|grep $a` #In Modules
+
+		if [ "$1" == "b" -o "$1" == "block" ]	
+		then
+			if [ $found == "" ];then
+				echo "$@ is not found on system"
+			elif [ $inbls != "" ];then
+				echo "$@ is already blocked"
+			else
+				echo "blacklist" $a >> "$blst"		
+			fi
+		elif [ "$1" == "a" -o "$1" == "allow" ]
+		then
+			if [ $found == "" ];then
+				echo "$@ is not found on system"
+			elif [ $inbls == "" ];then
+				echo "$@ is not blocked"
+			else
+				sed "/$a/d" $blst > ${blst}.save
+				mv ${blst}.save ${blst}
+			fi
+
+		fi
+	done
+fi
+exit
