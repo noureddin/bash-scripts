@@ -18,7 +18,7 @@ fi
 
 blst='/etc/modprobe.d/blacklist'
 
-if [ "$1" == "l" -o "$1" == "list" ]
+if [ "$1" == "l"] || ["$1" == "list" ]
 then
 	modsys=`lsmod|grep -v Module|sed 's/[ ].*//'`
 	blkmod=`cat $blst|sed 's/.*[ ]/(&)/'`
@@ -47,7 +47,7 @@ else
 		inbls=`cat $blst|grep $a` #In Blacklist
 		found=`lsmod|grep $a` #In Modules
 
-		if [ "$1" == "b" -o "$1" == "block" ]	
+		if [ "$1" == "b"] || ["$1" == "block" ]	
 		then
 			if [ $found == "" ];then
 				echo "$@ is not found on system"
@@ -56,7 +56,7 @@ else
 			else
 				echo "blacklist" $a >> "$blst"		
 			fi
-		elif [ "$1" == "a" -o "$1" == "allow" ]
+		elif [ "$1" == "a"] || ["$1" == "allow" ]
 		then
 			if [ $found == "" ];then
 				echo "$@ is not found on system"
