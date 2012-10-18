@@ -1,0 +1,9 @@
+#!/bin/bash
+#From: https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd
+DATE=`date +'%a %d/%m/%Y %R'
+`
+if [ "$1" != "" ];then
+	cd $1;fi
+git pull origin master
+git commit -a -m "Auto Sync - $DATE"
+git push origin master
