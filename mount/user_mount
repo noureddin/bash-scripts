@@ -1,0 +1,16 @@
+#!/bin/bash
+a=$(ls /dev/sd*)
+for i in $a
+do
+	if [ "${#i}" -ge 9 ]
+	then
+		b=`echo ${b} ${i}`
+	fi	
+done
+c=(${b})
+d=${#c}
+for ((s=0;s<=d;s++))
+do
+	e=${c[s]}
+	udisks --mount $e >/dev/null
+done

@@ -1,0 +1,25 @@
+README for Blocker
+
+ Application Blocker for Unix-like systems
+  You can use this script to block any application.
+  It -Simply- chmod 000 the application you want.
+  Its returns its permissions when you "allow" it.
+
+Installation:
+	sudo cp blocker /usr/sbin
+	sudo chmod 500 /usr/sbin/blocker #More Security ;)
+	touch /etc/blocker
+Usage:
+	Block:
+	 sudo blocker -b app1 app2 .. appN
+	Unblock(Allow):
+         sudo blocker -a app1 app2 .. appN
+         Mixed Input:
+	  sudo blocker -b app1 app2 .. appN -a app1 app2 .. appN
+	  #You can block and allow any number of application in one line
+	  sudo blocker -b app1 app2 -a app3 -b app4 -b app5 #Valid
+	Help:
+	 sudo blocker
+
+Contact me : noureddin95 at gmail dot com
+License: GNU GPL :)
