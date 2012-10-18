@@ -45,7 +45,7 @@ function permconv {
 	echo $permconv
 }
 
-if [ "$1" != "b"] || ["$1" != "block"] || ["$1" != "a"] || ["$1" != "allow" ]
+if [ "$1" != "b" ] && [ "$1" != "block" ] && [ "$1" != "a" ] && [ "$1" != "allow" ]
 then
 	echo '''
 	Application Blocker for Unix-like systems
@@ -84,13 +84,13 @@ do
 		if [ "$found" == "" ];then
 			echo "$a not found";fi
 
-		if [ "$1" == "b"] || ["$1" == "block" ]	
+		if [ "$1" == "b" ] || [ "$1" == "block" ]	
 		then
 			for file in $found
 			do		
 				if [ -e ${file} ];then
 					mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi			
-				if [ $mod == "0000" ]
+				if [ "$mod" == "0000" ]
 				then
 					echo "${file} is already blocked or have not any permissions"
 				else
@@ -100,14 +100,14 @@ do
 					echo blocked $file
 				fi
 			done
-		elif [ "$1" == "a"] || ["$1" == "allow" ]
+		elif [ "$1" == "a" ] || [ "$1" == "allow" ]
 		then
 			for file in $found
 			do
 				if [ -e ${file} ];then
 					mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi
 						
-				if [ $mod != "0000"] || ["`grep ${file} ${blst}`" == '' ]
+				if [ "$mod" != "0000" ] || [ "`grep ${file} ${blst}`" == '' ]
 				then
 					echo "${file} is not blocked or not found in blocked list"
 				else

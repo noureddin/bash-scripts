@@ -1,7 +1,7 @@
 #!/bin/bash
 #Install by "sudo cp modblock /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
 
-if [ "$1" != "b" -a "$1" != "block" -a "$1" != "a" -a "$1" != "allow" -a "$1" != "l" -a "$1" != "list" ]
+if [ "$1" != "b" ] && [ "$1" != "block" ] && [ "$1" != "a" ] && [ "$1" != "allow" ] && [ "$1" != "l" ] && [ "$1" != "list" ]
 then
 	echo '''
  Kernel Module Blocker for Unix-like systems (Now Debian Only)
@@ -18,10 +18,10 @@ fi
 
 blst='/etc/modprobe.d/blacklist'
 
-if [ "$1" == "l"] || ["$1" == "list" ]
+if [ "$1" == "l" ] || [ "$1" == "list" ]
 then
 	modsys=`lsmod|grep -v Module|sed 's/[ ].*//'`
-	blkmod=`cat $blst|sed 's/.*[ ]/(&)/'`
+	blkmod=`sed 's/.*[ ]//' $blst`
 	echo "Modules on System:"
 	if [ "$2" == "line" ];then
 		for i in $modsys;do echo $i;done
@@ -29,7 +29,7 @@ then
 		echo $modsys
 	fi
 	echo
-	echo "Blocked Modules"
+	echo "Blocked Modules:"
 	if [ "$blkmod" == "" ]
 	then
 		echo "  No modules were blocked"
@@ -44,27 +44,33 @@ else
 	arr=( $@ )
 	for a in ${arr[@]:1}
 	do		
-		inbls=`cat $blst|grep $a` #In Blacklist
 		found=`lsmod|grep $a` #In Modules
+		inbls=`cat $blst|grep $a` #In Blacklist
 
-		if [ "$1" == "b"] || ["$1" == "block" ]	
+		if [ "$1" == "b" ] || [ "$1" == "block" ]	
 		then
-			if [ $found == "" ];then
-				echo "$@ is not found on system"
-			elif [ $inbls != "" ];then
-				echo "$@ is already blocked"
+			if [ "$found" == "" ];then
+				echo "$a is not found on system"
+			elif [ "$inbls" != "" ];then
+				echo "$a is already blocked"
+			elif [ "$a" == "" ];then
+				echo "Nothing to block"
 			else
-				echo "blacklist" $a >> "$blst"		
+				echo "blacklist" $a >> "$blst"
+				echo "blocked $a"
 			fi
-		elif [ "$1" == "a"] || ["$1" == "allow" ]
+		elif [ "$1" == "a" ] || [ "$1" == "allow" ]
 		then
-			if [ $found == "" ];then
-				echo "$@ is not found on system"
-			elif [ $inbls == "" ];then
-				echo "$@ is not blocked"
+			if [ "$found" == "" ];then
+				echo "$a is not found on system"
+			elif [ "$inbls" == "" ];then
+				echo "$a is not blocked"
+			elif [ "$a" == "" ];then
+				echo "Nothing to block"
 			else
 				sed "/$a/d" $blst > ${blst}.save
 				mv ${blst}.save ${blst}
+				echo "allowed $a"
 			fi
 
 		fi
