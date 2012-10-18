@@ -14,3 +14,10 @@ do
 	e=${c[s]}
 	udisks --mount $e >/dev/null
 done
+
+#This easily could be:
+#a=$(ls /dev/sd*)
+#for i in $a
+#do
+#	udisks --mount $i &>/dev/null
+#done
