@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #Install by "sudo cp blocker /usr/sbin;sudo touch /etc/blocker"
 
 blst="/etc/blocker"
@@ -45,81 +45,119 @@ function permconv {
 	echo $permconv
 }
 
-if [ "$1" != "b" ] && [ "$1" != "block" ] && [ "$1" != "a" ] && [ "$1" != "allow" ]
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-ll" ] && [ "$1" != "-i" ]
 then
 	echo '''
-	Application Blocker for Unix-like systems
-	 You can use this script to block any application.
-	 It -Simply- chmod 000 the application you want.
-	 Its returns its permissions when you "allow" it.
-	 Usage:
-		b, block [app] #to block any application
-		a, allow [app] #to allow any blocked application
-		any thing else #to show this help ;)		
-				'''	
+ Application Blocker for Unix-like systems
+  You can use this script to block any application.
+  It -Simply- chmod 000 the application you want.
+  Its returns its permissions when you "allow" it.
+  Usage:
+	-b [app] #to block any application
+	-a [app] #to allow any blocked application
+	-l       #to list all blocked applications
+	-ll      #like previous but every application per line
+	-i       #to install this application to your system
+	any thing else #to show this help ;)		
+'''	
 fi
-arr=( $@ )
 
-for a in ${arr[@]:1}
-do
-	found=""
-	if [ $a != $1 ]
+function list {
+	if [ "$1" == "line" ]
 	then
-		for dir in $path
-		do
-			if [ -e "${dir}/${a}" ]
+		cat $blst|sed 's/[ ].*//'|sed 's/\/.*\///'
+	else
+		blkapp=`cat $blst|sed 's/[ ].*//'|sed 's/\/.*\///'`
+		echo $blkapp
+	fi
+}
+
+for a in $@
+do
+	if [ "$a" == "-b" ]
+	then
+		case="block"
+		continue
+	elif [ "$a" == "-a" ]
+	then
+		case="allow"
+		continue
+	elif [ "$a" == "-l" ]
+	then
+		list
+		continue
+	elif [ "$a" == "-ll" ]
+	then
+		list line
+		continue
+	elif [ "$a" == "-i" ]
+	then
+		cp $0 /usr/sbin
+		app=`echo $0|sed 's/.*\///'`
+		chmod 0500 $app &>/dev/null
+		echo "Blocker Installed"
+		continue
+	fi
+	
+	found=""
+	for dir in $path
+	do
+		if [ -e "${dir}/${a}" ]
+		then
+			type=`ls -l "${dir}/${a}"|sed "s/[ ].*//"`
+			if [ ${type:0:1} == "l" ]
 			then
-				type=`ls -l "${dir}/${a}"|sed "s/[ ].*//"`
-				if [ ${type:0:1} == "l" ]
-				then
-					link=`ls -l ${dir}/${a}|sed "s/.*[ ]//"`
-					if [ ${link:0:1} != '/' ];then
-						link="${dir}/${link}";fi
-					found="$found $link"
-				else
-					found="$found $dir/$a"
-				fi
+				link=`ls -l ${dir}/${a}|sed "s/.*[ ]//"`
+				if [ ${link:0:1} != '/' ];then
+					link="${dir}/${link}";fi
+				if [ -e $link ];then
+					found="$found $link";fi
+			else
+				found="$found $dir/$a"
+			fi
+		fi
+	done
+	if [ "$found" == "" ]
+	then
+		echo "$a not found"
+		continue
+	fi
+
+	if [ "$case" == "block" ]
+	then
+		for file in $found
+		do		
+			if [ -e ${file} ];then
+				mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi			
+			if [ "$mod" == "0000" ]
+			then
+				echo "${file} is already blocked or have not any permissions"
+			else
+				killall -q ${file} 
+				echo "${file} ${mod}" >> "$blst"
+				chmod 000 $file
+				echo blocked $file
 			fi
 		done
-		if [ "$found" == "" ];then
-			echo "$a not found";fi
-
-		if [ "$1" == "b" ] || [ "$1" == "block" ]	
-		then
-			for file in $found
-			do		
-				if [ -e ${file} ];then
-					mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi			
-				if [ "$mod" == "0000" ]
-				then
-					echo "${file} is already blocked or have not any permissions"
-				else
-					killall -q ${file} 
-					echo "${file} ${mod}" >> "$blst"
-					chmod 000 $file
-					echo blocked $file
-				fi
-			done
-		elif [ "$1" == "a" ] || [ "$1" == "allow" ]
-		then
-			for file in $found
-			do
-				if [ -e ${file} ];then
-					mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi
-						
-				if [ "$mod" != "0000" ] || [ "`grep ${file} ${blst}`" == '' ]
-				then
-					echo "${file} is not blocked or not found in blocked list"
-				else
-					perm=`grep $file $blst|sed 's/.*[ ]//'`
-					chmod $perm $file
-					echo allowed $file
-					file=${file//$'/'/$'\/'}
-					sed "/$file/d" $blst > ${blst}.save
-					mv ${blst}.save ${blst}
-				fi
-			done
-		fi
+	elif [ "$case" == "allow" ]
+	then
+		for file in $found
+		do
+			if [ -e ${file} ];then
+				mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\``;fi
+					
+			if [ "$mod" != "0000" ] || [ "`grep ${file} ${blst}`" == '' ]
+			then
+				echo "${file} is not blocked or not found in blocked list"
+			else
+				perm=`grep $file $blst|sed 's/.*[ ]//'`
+				chmod $perm $file
+				echo allowed $file
+				file=${file//$'/'/$'\/'}
+				sed "/$file/d" $blst > ${blst}.save
+				mv ${blst}.save ${blst}
+			fi
+		done
 	fi
 done
 chmod 0000 $blst

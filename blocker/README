@@ -6,16 +6,23 @@ README for Blocker
   Its returns its permissions when you "allow" it.
 
 Installation:
-	sudo cp blocker /usr/sbin
-	sudo chmod 500 /usr/sbin/blocker #More Security ;)
-	touch /etc/blocker
+	 sudo ./blocker -i
+	OR:
+	 sudo cp blocker /usr/sbin
+	 sudo chmod 500 /usr/sbin/blocker #More Security ;)
+	 touch /etc/blocker
 Usage:
 	Block:
-	 sudo blocker b app1 app2 .. appN
-	 sudo blocker block app1 app2 .. appN
-	Unblock:
-         sudo blocker a app1 app2 .. appN
-         sudo blocker allow app1 app2 .. appN
+	 sudo blocker -b app1 app2 .. appN
+	Unblock(Allow):
+         sudo blocker -a app1 app2 .. appN
+         Mixed Input:
+	  sudo blocker -b app1 app2 .. appN -a app1 app2 .. appN
+	  #You can block and allow any number of application in one line
+	  sudo blocker -b app1 app2 -a app3 -b app4 -b app5 #Valid
+	List:
+	 sudo blocker -l  #to list all
+	 sudo blocker -ll #to list all but one per line
 	Help:
 	 sudo blocker
 

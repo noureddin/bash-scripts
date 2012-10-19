@@ -1,79 +1,100 @@
 #!/bin/bash
-#Install by "sudo cp modblock /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
+#Install by "sudo cp modblock2 /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
 
-if [ "$1" != "b" ] && [ "$1" != "block" ] && [ "$1" != "a" ] && [ "$1" != "allow" ] && [ "$1" != "l" ] && [ "$1" != "list" ]
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-ll" ] && [ "$1" != "-i" ]
 then
 	echo '''
  Kernel Module Blocker for Unix-like systems (Now Debian Only)
   You can use this script to block any kernel module.
   It -Simply- add it to the blacklist, And removes it when you "allow" it.
   Usage:
-	b, block [mod] #to block any module
-	a, allow [mod] #to allow any blocked module
-	l, list        #to list all "Modules on System" and "Blocked Modules"
-	l, list line   #to list all modules like previous but per line
+	-b  [mod] #to block any module
+	-a  [mod] #to allow any blocked module
+	-l        #to list all "Modules on System" and "Blocked Modules"
+	-ll       #like previous but every module per line
+	-i        #to install this application to your system
 	any thing else #to show this help ;)		
 '''
 fi
 
 blst='/etc/modprobe.d/blacklist'
+touch $blst
 
-if [ "$1" == "l" ] || [ "$1" == "list" ]
-then
-	modsys=`lsmod|grep -v Module|sed 's/[ ].*//'`
-	blkmod=`sed 's/.*[ ]//' $blst`
+function list {
+	blkmod=`sed 's/.*[ ]//' $blst` #List Blacklist
+	
 	echo "Modules on System:"
-	if [ "$2" == "line" ];then
-		for i in $modsys;do echo $i;done
+	if [ "$1" == "line" ];then
+		lsmod|grep -v Module|sed 's/[ ].*//'
 	else
-		echo $modsys
+		modsys=`lsmod|grep -v Module|sed 's/[ ].*//'`;echo $modsys
 	fi
+	
 	echo
 	echo "Blocked Modules:"
-	if [ "$blkmod" == "" ]
-	then
-		echo "  No modules were blocked"
+	if [ "$1" == "line" ];then
+		sed 's/.*[ ]//' $blst
 	else
-		if [ "$2" == "line" ];then
-			for i in $blkmod;do echo $i;done
-		else
-			echo $blkmod
-		fi
+		blkmod=`sed 's/.*[ ]//' $blst`;echo $blkmod
 	fi
-else
-	arr=( $@ )
-	for a in ${arr[@]:1}
-	do		
-		found=`lsmod|grep $a` #In Modules
-		inbls=`cat $blst|grep $a` #In Blacklist
 
-		if [ "$1" == "b" ] || [ "$1" == "block" ]	
-		then
-			if [ "$found" == "" ];then
-				echo "$a is not found on system"
-			elif [ "$inbls" != "" ];then
-				echo "$a is already blocked"
-			elif [ "$a" == "" ];then
-				echo "Nothing to block"
-			else
-				echo "blacklist" $a >> "$blst"
-				echo "blocked $a"
-			fi
-		elif [ "$1" == "a" ] || [ "$1" == "allow" ]
-		then
-			if [ "$found" == "" ];then
-				echo "$a is not found on system"
-			elif [ "$inbls" == "" ];then
-				echo "$a is not blocked"
-			elif [ "$a" == "" ];then
-				echo "Nothing to block"
-			else
-				sed "/$a/d" $blst > ${blst}.save
-				mv ${blst}.save ${blst}
-				echo "allowed $a"
-			fi
+}
+for a in $@
+do
+	if [ "$a" == "-b" ]
+	then
+		case="block"
+		continue
+	elif [ "$a" == "-a" ]
+	then
+		case="allow"
+		continue
+	elif [ "$a" == "-l" ]
+	then
+		list
+		continue
+	elif [ "$a" == "-ll" ]
+	then
+		list line
+		continue
+	elif [ "$a" == "-i" ]
+	then
+		cp $0 /usr/sbin
+		app=`echo $0|sed 's/.*\///'`
+		chmod 0500 $app &>/dev/null
+		echo "ModuleBlocker Installed"
+		continue
+	fi
 
+	found=`lsmod|grep $a` #In Modules
+	inbls=`cat $blst|grep $a` #In Blacklist
+
+	if [ "$case" == "block" ]
+	then
+		if [ "$found" == "" ];then
+			echo "$a is not found on system"
+		elif [ "$inbls" != "" ];then
+			echo "$a is already blocked"
+		elif [ "$a" == "" ];then
+			echo "Nothing to block"
+		else
+			echo "blacklist" $a >> "$blst"		
+			echo "blocked $a"
 		fi
-	done
-fi
+	elif [ "$case" == "allow" ]
+	then
+		if [ "$found" == "" ];then
+			echo "$a is not found on system"
+		elif [ "$inbls" == "" ];then
+			echo "$a is not blocked"
+		elif [ "$a" == "" ];then
+			echo "Nothing to allow"
+		else
+			sed "/$a/d" $blst > ${blst}.save
+			mv ${blst}.save ${blst}
+			echo "allowed $a"
+		fi
+
+	fi
+done
 exit
