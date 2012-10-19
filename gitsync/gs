@@ -5,5 +5,5 @@ DATE=`date +'%a %d/%m/%Y %R'
 if [ "$1" != "" ];then
 	cd $1;fi
 git pull origin master
-git commit -a -m "Auto Sync - $DATE"
+git commit -a -m "Update - $DATE"
 git push origin master
