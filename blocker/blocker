@@ -1,7 +1,26 @@
 #!/bin/bash
 #Install by "sudo cp blocker /usr/sbin;sudo touch /etc/blocker"
 
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-ll" ] && [ "$1" != "-i" ]
+then
+	echo '''
+ Application Blocker for Unix-like systems
+  You can use this script to block any application.
+  It -Simply- chmod 000 the application you want.
+  Its returns its permissions when you "allow" it.
+  Usage:
+	-b [app] #to block any application
+	-a [app] #to allow any blocked application
+	-l       #to list all blocked applications
+	-ll      #like previous but every application per line
+	-i       #to install this application to your system
+	any thing else #to show this help ;)		
+'''	
+exit
+fi
+
 blst="/etc/blocker"
+touch $blst
 chmod 0777 $blst
 path=`echo $PATH|sed 's/:/ /g'`
 
@@ -44,23 +63,6 @@ function permconv {
 	fi
 	echo $permconv
 }
-
-if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-ll" ] && [ "$1" != "-i" ]
-then
-	echo '''
- Application Blocker for Unix-like systems
-  You can use this script to block any application.
-  It -Simply- chmod 000 the application you want.
-  Its returns its permissions when you "allow" it.
-  Usage:
-	-b [app] #to block any application
-	-a [app] #to allow any blocked application
-	-l       #to list all blocked applications
-	-ll      #like previous but every application per line
-	-i       #to install this application to your system
-	any thing else #to show this help ;)		
-'''	
-fi
 
 function list {
 	if [ "$1" == "line" ]

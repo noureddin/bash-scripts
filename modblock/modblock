@@ -15,6 +15,7 @@ then
 	-i        #to install this application to your system
 	any thing else #to show this help ;)		
 '''
+exit
 fi
 
 blst='/etc/modprobe.d/blacklist'
