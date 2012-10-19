@@ -21,7 +21,6 @@ blst='/etc/modprobe.d/blacklist'
 touch $blst
 
 function list {
-	blkmod=`sed 's/.*[ ]//' $blst` #List Blacklist
 	
 	echo "Modules on System:"
 	if [ "$1" == "line" ];then
