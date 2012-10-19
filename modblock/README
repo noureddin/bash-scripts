@@ -1,0 +1,25 @@
+README for modblock
+
+ Kernel Module Blocker for Unix-like systems (Now Debian Only)
+  You can use this script to block any kernel module.
+  It -Simply- add it to the blacklist, And removes it when you "allow" it.
+
+Installation:
+	 sudo ./modblock -i
+Usage:
+	Block:
+	 sudo modblock -b mod1 mod2 .. modN
+	Unblock(Allow):
+         sudo modblock -a mod1 mod2 .. modN
+         Mixed Input:
+	  sudo modblock -b mod1 mod2 .. modN -a mod1 mod2 .. modN
+	  #You can block and allow any number of modules in one line
+	  sudo modblock -b mod1 mod2 -a mod3 -b mod4 -b mod5 #Valid
+	List:
+	 sudo modblock -l  #to list all
+	 sudo modblock -ll #to list all but one per line
+	Help:
+	 sudo modblock
+
+Contact me : noureddin95 at gmail dot com
+License: GNU GPL :)
