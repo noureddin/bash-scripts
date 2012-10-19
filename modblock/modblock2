@@ -17,7 +17,10 @@ then
 fi
 
 blst='/etc/modprobe.d/blacklist'
-
+if [ ! -f "$blst" ]
+then
+	touch $blst
+fi
 
 function list {
 	modsys=`lsmod|grep -v Module|sed 's/[ ].*//'` #List Modules on System
