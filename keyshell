@@ -1,5 +1,6 @@
 #!/bin/bash
 # a shell script to generate a setxkbmap line and make it "autostart"
+#Problem "~/.config/autostart/keymap.desktop: No such file or directory" ?!!
 clear
 echo "This Will help you make your keyboard multilayout easily. v1.0"
 echo
@@ -14,16 +15,17 @@ echo "Genterating now the command..."
 kym="setxkbmap -layout \"$ly\" -option \"grp:${wy})_toggle,grp_led:${ld}\""
 clear
 echo "Line generated, Now making it \"autostart\""
-
-echo "[Desktop Entry]" > "~/.config/autostart/keymap.desktop"
-echo "Encoding=UTF-8" >> "~/.config/autostart/keymap.desktop"
-echo "Version=0.9.4" >> "~/.config/autostart/keymap.desktop"
-echo "Type=Application" >> "~/.config/autostart/keymap.desktop"
-echo "Name=KeyMap" >> "~/.config/autostart/keymap.desktop"
-echo "Exec=${kym}" >> "~/.config/autostart/keymap.desktop"
-echo "StartupNotify=false" >> "~/.config/autostart/keymap.desktop"
-echo "Terminal=false" >> "~/.config/autostart/keymap.desktop"
-echo "Hidden=false" >> "~/.config/autostart/keymap.desktop"
+mkdir ~/.config ~/.config/autostart &>/dev/null
+filename="~/.config/autostart/keymap.desktop"
+echo "[Desktop Entry]" > "$filename"
+echo "Encoding=UTF-8" >> "$filename"
+echo "Version=0.9.4" >> "$filename"
+echo "Type=Application" >> "$filename"
+echo "Name=KeyMap" >> "$filename"
+echo "Exec=${kym}" >> "$filename"
+echo "StartupNotify=false" >> "$filename"
+echo "Terminal=false" >> "$filename"
+echo "Hidden=false" >> "$filename"
 echo
-echo "Added."
+echo "Done!"
 exit 0
