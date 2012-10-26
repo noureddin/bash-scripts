@@ -1,7 +1,6 @@
 #!/bin/bash
 #run with 'root' because of `blkid`
-#example: sudo ./getuuid /dev/sda1
-a=`blkid $@`
-echo $a | sed 's/.*UUID="\([^"]\+\)".*/\1/'
+#example: sudo ./getuuid /dev/sda1 or even sudo ./getuuid sda1
+blkid|grep $1|sed 's/.*UUID="\([^"]\+\)".*/\1/'
 #You can replace UUID with TYPE or LABEL
 #If LABEL not found, It returns all the string which starts with '/dev/sd...'

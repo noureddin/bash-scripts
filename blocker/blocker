@@ -119,7 +119,7 @@ do
 			fi
 		fi
 	done
-	if [ "$found" == "" ]
+	if [ -z "$found" ]
 	then
 		echo "$a not found"
 		continue

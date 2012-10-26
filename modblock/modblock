@@ -1,7 +1,7 @@
 #!/bin/bash
 #Install by "sudo cp modblock2 /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
 
-if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-ll" ] && [ "$1" != "-i" ]
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-i" ]
 then
 	echo '''
  Kernel Module Blocker for Unix-like systems (Now Debian Only)
@@ -11,7 +11,9 @@ then
 	-b  [mod] #to block any module
 	-a  [mod] #to allow any blocked module
 	-l        #to list all "Modules on System" and "Blocked Modules"
-	-ll       #like previous but every module per line
+	-lc       #like previous but compact
+	-lb       #to list blocked modules
+	-la       #to list allowed modules
 	-i        #to install this application to your system
 	any thing else #to show this help ;)		
 '''
@@ -23,19 +25,44 @@ touch $blst
 
 function list {
 	
+	if [ "$1" == "blocked" ]
+	then
+		sed 's/.*[ ]//' $blst|grep -v '^$'
+		exit
+	elif [ "$1" == "allowed" ]
+	then
+		if [ -s $blst ]
+		then
+			lsmod|grep -v Module|sed 's/[ ].*//'|grep -v "`sed 's/.*[ ]//' $blst`"
+		else
+			lsmod|grep -v Module|sed 's/[ ].*//'
+		fi
+		exit
+	fi
+	
 	echo "Modules on System:"
-	if [ "$1" == "line" ];then
-		lsmod|grep -v Module|sed 's/[ ].*//'
-	else
-		modsys=`lsmod|grep -v Module|sed 's/[ ].*//'`;echo $modsys
+	a=`lsmod|grep -v Module|sed 's/[ ].*//'`
+	if [ "$1" == "compact" ];then
+		echo $a
+	else		
+		for i in $a
+		do
+			echo "  $i"
+		done
 	fi
 	
 	echo
 	echo "Blocked Modules:"
-	if [ "$1" == "line" ];then
-		sed 's/.*[ ]//' $blst
+	a=`sed 's/.*[ ]//' $blst`
+	if [ -z "$a" ];then
+		echo "  No modules were blocked";fi
+	if [ "$1" == "compact" ];then
+		echo $a
 	else
-		blkmod=`sed 's/.*[ ]//' $blst`;echo $blkmod
+		for i in $a
+		do
+			echo "  $i"
+		done
 	fi
 
 }
@@ -53,13 +80,22 @@ do
 	then
 		list
 		continue
-	elif [ "$a" == "-ll" ]
+	elif [ "$a" == "-lc" ]
 	then
-		list line
+		list compact
+		continue
+	elif [ "$a" == "-lb" ]
+	then
+		list blocked
+		continue
+	elif [ "$a" == "-la" ]
+	then
+		list allowed
 		continue
 	elif [ "$a" == "-i" ]
 	then
-		cp $0 /usr/sbin
+		#cp $0 /usr/sbin
+		cp $0 /usr/bin
 		app=`echo $0|sed 's/.*\///'`
 		chmod 0500 $app &>/dev/null
 		echo "ModuleBlocker Installed"
@@ -71,11 +107,11 @@ do
 
 	if [ "$case" == "block" ]
 	then
-		if [ "$found" == "" ];then
+		if [ -z "$found" ];then
 			echo "$a is not found on system"
-		elif [ "$inbls" != "" ];then
+		elif [ ! -z "$inbls" ];then
 			echo "$a is already blocked"
-		elif [ "$a" == "" ];then
+		elif [ -z "$a" ];then
 			echo "Nothing to block"
 		else
 			echo "blacklist" $a >> "$blst"		
@@ -83,11 +119,11 @@ do
 		fi
 	elif [ "$case" == "allow" ]
 	then
-		if [ "$found" == "" ];then
+		if [ -z "$found" ];then
 			echo "$a is not found on system"
-		elif [ "$inbls" == "" ];then
+		elif [ -z "$inbls" ];then
 			echo "$a is not blocked"
-		elif [ "$a" == "" ];then
+		elif [ -z "$a" ];then
 			echo "Nothing to allow"
 		else
 			sed "/$a/d" $blst > ${blst}.save
