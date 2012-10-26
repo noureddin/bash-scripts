@@ -1,0 +1,6 @@
+#!/bin/bash
+a=$(ls /dev/sd*)
+for i in $a
+do
+	udisks --mount $i --mount-options umask=0 &>/dev/null
+done
