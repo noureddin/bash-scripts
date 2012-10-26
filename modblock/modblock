@@ -4,7 +4,7 @@
 if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-i" ]
 then
 	echo '''
- Kernel Module Blocker for Unix-like systems (Now Debian Only)
+ Kernel Module Blocker for Unix-like systems (Still Beta)
   You can use this script to block any kernel module.
   It -Simply- add it to the blacklist, And removes it when you "allow" it.
   Usage:
@@ -20,7 +20,7 @@ then
 exit
 fi
 
-blst='/etc/modprobe.d/blacklist'
+blst='/etc/modprobe.d/blacklist.conf'
 touch $blst
 
 function list {
