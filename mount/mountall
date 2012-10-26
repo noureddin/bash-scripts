@@ -1,4 +1,5 @@
 #!/bin/bash
+#add this script to /etc/rc.local before "exit 0" line.
 a=$(ls /dev/sd*)
 for i in $a
 do
