@@ -95,8 +95,6 @@ do
 	elif [ "$a" == "-i" ]
 	then
 		cp $0 /usr/sbin
-		app=`echo $0|sed 's/.*\///'`
-		chmod 0500 $app &>/dev/null
 		echo "Blocker Installed"
 		continue
 	fi
@@ -135,7 +133,7 @@ do
 			then
 				echo "${file} is already blocked or have not any permissions"
 			else
-				killall -q ${file} 
+				killall -q `echo ${file}|sed 's/.*\///'`
 				echo "${file} ${mod}" >> "$blst"
 				chmod 000 $file
 				echo blocked $file

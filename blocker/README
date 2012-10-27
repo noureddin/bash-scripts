@@ -9,7 +9,6 @@ Installation:
 	 sudo ./blocker -i
 	OR:
 	 sudo cp blocker /usr/sbin
-	 sudo chmod 500 /usr/sbin/blocker #More Security ;)
 	 touch /etc/blocker
 Usage:
 	Block:
