@@ -1,104 +1,113 @@
 #!/bin/bash
-#Install by "sudo cp modblock2 /usr/sbin;sudo touch /etc/modprobe.d/blacklist"
+#Install by "sudo ./modblock -i"
 
-if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-i" ]
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-u" ] && [ "$1" != "-i" ] && [ "$1" != "-aa" ]
 then
 	echo '''
- Kernel Module Blocker for Unix-like systems (Still Beta)
+ Kernel Module Blocker for Unix-like systems (Still Testing)
   You can use this script to block any kernel module.
-  It -Simply- add it to the blacklist, And removes it when you "allow" it.
   Usage:
-	-b  [mod] #to block any module
-	-a  [mod] #to allow any blocked module
-	-l        #to list all "Modules on System" and "Blocked Modules"
-	-lc       #like previous but compact
-	-lb       #to list blocked modules
-	-la       #to list allowed modules
-	-i        #to install this application to your system
-	any thing else #to show this help ;)		
+	-b [mod] #to block any module
+	-a [mod] #to allow any blocked module
+	-l       #to list all "Modules on System" and "Blocked Modules"
+	-lc      #like previous but compact
+	-lb      #to list only blocked modules
+	-la      #to list only non-blocked modules
+	-u       #use it when you finish to probe all modules and update your initrd
+	-i       #to install this application to your system
+	-aa      #to empty the blacklist and allow all blocked modules
+	any thing else:
+	         #to show this help ;)
 '''
 exit
 fi
 
-blst='/etc/modprobe.d/blacklist.conf'
+#blst='/etc/modprobe.d/modblock.conf'
+blst='conf'
 touch $blst
 
 function list {
-	
+
 	if [ "$1" == "blocked" ]
 	then
-		sed 's/.*[ ]//' $blst|grep -v '^$'
+		grep -v '^$' $blst|sed 's/.*[ ]//'
 		exit
 	elif [ "$1" == "allowed" ]
 	then
 		if [ -s $blst ]
 		then
-			lsmod|grep -v Module|sed 's/[ ].*//'|grep -v "`sed 's/.*[ ]//' $blst`"
+			lsmod|grep -v Module|sed 's/[ ].*//'|grep -v "`grep -v '^$' $blst|sed 's/.*[ ]//'`"
 		else
 			lsmod|grep -v Module|sed 's/[ ].*//'
 		fi
 		exit
-	fi
-	
-	echo "Modules on System:"
-	a=`lsmod|grep -v Module|sed 's/[ ].*//'`
-	if [ "$1" == "compact" ];then
-		echo $a
-	else		
-		for i in $a
-		do
-			echo "  $i"
-		done
-	fi
-	
-	echo
-	echo "Blocked Modules:"
-	a=`sed 's/.*[ ]//' $blst`
-	if [ -z "$a" ];then
-		echo "  No modules were blocked";fi
-	if [ "$1" == "compact" ];then
-		echo $a
 	else
-		for i in $a
-		do
-			echo "  $i"
-		done
+		echo "Modules on System:"
+		a=`lsmod|grep -v Module|sed 's/[ ].*//'`
+		if [ "$1" == "compact" ];then
+			echo "  "$a
+		else		
+			for i in $a
+			do
+				echo "  $i"
+			done
+		fi
+	
+		echo
+		echo "Blocked Modules:"
+		a=`grep -v '^$' $blst|sed 's/.*[ ]//'`
+		if [ -z "$a" ];then
+			echo "  No modules were blocked";fi
+		if [ "$1" == "compact" ];then
+			echo $a
+		else
+			for i in $a
+			do
+				echo "  $i"
+			done
+		fi
 	fi
 
 }
 for a in $@
 do
-	if [ "$a" == "-b" ]
+	if [ "$a" == "-b" ] #block
 	then
 		case="block"
 		continue
-	elif [ "$a" == "-a" ]
+	elif [ "$a" == "-a" ] #allow
 	then
 		case="allow"
 		continue
-	elif [ "$a" == "-l" ]
+	elif [ "$a" == "-l" ] #list
 	then
 		list
 		continue
-	elif [ "$a" == "-lc" ]
+	elif [ "$a" == "-lc" ] #list compact
 	then
 		list compact
 		continue
-	elif [ "$a" == "-lb" ]
+	elif [ "$a" == "-lb" ] #list blocked
 	then
 		list blocked
 		continue
-	elif [ "$a" == "-la" ]
+	elif [ "$a" == "-la" ] #list allowed
 	then
 		list allowed
 		continue
-	elif [ "$a" == "-i" ]
+	elif [ "$a" == "-u" ] #probe modules and update initrd
 	then
-		#cp $0 /usr/sbin
-		cp $0 /usr/bin
+		depmod -ae
+		update-initramfs -u
+	elif [ "$a" == "-i" ] #install
+	then
+		cp $0 /usr/sbin
 		app=`echo $0|sed 's/.*\///'`
-		chmod 0500 $app &>/dev/null
 		echo "ModuleBlocker Installed"
+		continue
+	elif [ "$a" == "-aa" ] #empty blaclist and allow all modules
+	then
+		echo >"$blst"
 		continue
 	fi
 
