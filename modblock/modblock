@@ -1,8 +1,6 @@
 #!/bin/bash
-#Install by "sudo ./modblock -i"
 
-if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-u" ] && [ "$1" != "-i" ] && [ "$1" != "-aa" ]
-then
+function modhelp {
 	echo '''
  Kernel Module Blocker for Unix-like systems (Still Testing)
   You can use this script to block any kernel module.
@@ -19,11 +17,15 @@ then
 	any thing else:
 	         #to show this help ;)
 '''
+}
+
+if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-u" ] && [ "$1" != "-i" ] && [ "$1" != "-aa" ]
+then
+	modhelp
 exit
 fi
 
-#blst='/etc/modprobe.d/modblock.conf'
-blst='conf'
+blst='/etc/modprobe.d/modblock.conf'
 touch $blst
 
 function list {
@@ -105,12 +107,17 @@ do
 		app=`echo $0|sed 's/.*\///'`
 		echo "ModuleBlocker Installed"
 		continue
-	elif [ "$a" == "-aa" ] #empty blaclist and allow all modules
+	elif [ "$a" == "-aa" ] #empty blacklist and allow all modules
 	then
 		echo >"$blst"
 		continue
 	fi
-
+	
+	if [ "$case" != "block" ] && [ "$case" != "allow" ]
+	then
+		modhelp
+	fi
+	
 	found=`lsmod|grep $a` #In Modules
 	inbls=`cat $blst|grep $a` #In Blacklist
 
