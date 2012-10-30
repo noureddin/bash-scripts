@@ -1,8 +1,11 @@
 #!/bin/bash
 
-function modhelp {
-	echo '''
- Kernel Module Blocker for Unix-like systems (Still Testing)
+hb=0 #helpboolean , to prevent printing help more than one time
+function echohelp {
+	if [ $hb -eq 0 ]
+	then
+		echo '
+ Kernel Module Blocker for Unix-like systems (Still Under Testing)
   You can use this script to block any kernel module.
   Usage:
 	-b [mod] #to block any module
@@ -16,39 +19,37 @@ function modhelp {
 	-aa      #to empty the blacklist and allow all blocked modules
 	any thing else:
 	         #to show this help ;)
-'''
+'
+		hb=1
+	fi
 }
 
-if [ "$1" != "-b" ] && [ "$1" != "-a" ] && [ "$1" != "-l" ] && [ "$1" != "-lc" ] && [ "$1" != "-lb" ] && [ "$1" != "-la" ] && [ "$1" != "-u" ] && [ "$1" != "-i" ] && [ "$1" != "-aa" ]
-then
-	modhelp
-exit
-fi
-
-blst='/etc/modprobe.d/modblock.conf'
-touch $blst
+blst='/etc/modprobe.d/modblock.conf' #blacklist file
+touch $blst #to stop errors if not found ;)
 
 function list {
 
-	if [ "$1" == "blocked" ]
+	if [ "$1" == "blocked" ] #to list blocked modules only (doesn't print: 'No moudels were blocked', to facilitate using it in an application
 	then
-		grep -v '^$' $blst|sed 's/.*[ ]//'
+		grep -v '^$' $blst|sed 's/.*[ ]//' # the grep cmd here to remove any empty lines
 		exit
 	elif [ "$1" == "allowed" ]
 	then
-		if [ -s $blst ]
+		if [ -s $blst ] #check if list not empty
 		then
 			lsmod|grep -v Module|sed 's/[ ].*//'|grep -v "`grep -v '^$' $blst|sed 's/.*[ ]//'`"
+			#to remove blocked modules from the list, to print only the non-blocked modules
 		else
 			lsmod|grep -v Module|sed 's/[ ].*//'
+			#if we used the last line and the blacklist was empty, it would print nothing
 		fi
 		exit
 	else
 		echo "Modules on System:"
-		a=`lsmod|grep -v Module|sed 's/[ ].*//'`
+		a=`lsmod|grep -v Module|sed 's/[ ].*//'` #grep -v Module to remove the table header ;)
 		if [ "$1" == "compact" ];then
-			echo "  "$a
-		else		
+			echo "  "$a #add margin
+		else
 			for i in $a
 			do
 				echo "  $i"
@@ -101,48 +102,48 @@ do
 	then
 		depmod -ae
 		update-initramfs -u
+		continue
 	elif [ "$a" == "-i" ] #install
 	then
-		cp $0 /usr/sbin
-		app=`echo $0|sed 's/.*\///'`
+		cp $0 /usr/sbin #used $0 not 'modblock' to install/copy it whatever
+		#its name was. and copied to /usr/sbin to be used only by root
 		echo "ModuleBlocker Installed"
 		continue
 	elif [ "$a" == "-aa" ] #empty blacklist and allow all modules
 	then
-		echo >"$blst"
+		echo -n >"$blst" # -n to prevent printing newline
+		continue
+	elif [ "${a:0:1}" == "-" ] #if first letter is dash, to prevent any non-understood options
+	then
+		echohelp
 		continue
 	fi
-	
-	if [ "$case" != "block" ] && [ "$case" != "allow" ]
+
+	if [ "$case" != "block" ] && [ "$case" != "allow" ] #if entered modname without type -b or -a
 	then
-		modhelp
+		echohelp
+		continue
 	fi
-	
-	found=`lsmod|grep $a` #In Modules
-	inbls=`cat $blst|grep $a` #In Blacklist
+
+	inbls=`cat $blst|grep $a` #search for module in blocked modules
 
 	if [ "$case" == "block" ]
 	then
-		if [ -z "$found" ];then
-			echo "$a is not found on system"
-		elif [ ! -z "$inbls" ];then
-			echo "$a is already blocked"
-		elif [ -z "$a" ];then
-			echo "Nothing to block"
+		found=`lsmod|grep $a` #search for module in system modules, used only with block case
+		if [ -z "$found" ] || [ ! -z "$inbls" ]
+		then
+			echo "$a is not found on system or it is already blocked"
 		else
-			echo "blacklist" $a >> "$blst"		
+			echo "blacklist" $a >> "$blst" #add it to blacklist
 			echo "blocked $a"
 		fi
 	elif [ "$case" == "allow" ]
 	then
-		if [ -z "$found" ];then
-			echo "$a is not found on system"
-		elif [ -z "$inbls" ];then
+		if [ -z "$inbls" ] #to allow a module it must found in blacklist, nothing else matters
+		then
 			echo "$a is not blocked"
-		elif [ -z "$a" ];then
-			echo "Nothing to allow"
 		else
-			sed "/$a/d" $blst > ${blst}.save
+			sed "/$a/d" $blst > ${blst}.save #remove it from blacklist
 			mv ${blst}.save ${blst}
 			echo "allowed $a"
 		fi
