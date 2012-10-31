@@ -1,0 +1,47 @@
+#!/bin/bash
+# a shell script to generate a setxkbmap line and make it "autostart"
+#the path '~/' prints error, so replaced by '/home/$USER/'
+if [ -z "$1" ] || [ "$1" == "-h" ]
+then
+	echo "
+ KeySwapper, the easy way to make your keyboard multilingual
+  Usage:
+    ./keyswap layout1,layout2,..,layoutN switch_keys indicator_led
+    example:
+    ./keyswap us,ru,ara alt_shift scroll
+     To use \"us\" and \"ru\" and \"ara\" layouts, and switch between them (toggle) using \"alt\"
+     and \"shift\", and turn on \"scroll\" led when the current layout is NOT the first.
+    Note:
+     If you didn't choose switch_keys or indicator_led, It\'d be \"alt_shift\" and \"scroll\"
+"
+exit
+fi
+kym="setxkbmap -layout \"$1\" -option \"grp:"
+if [ -z $2 ]
+then
+	kym=${kym}"alt_shift_toggle,grp_led:"
+else
+	kym=${kym}${2}"_toggle,grp_led:"
+fi
+
+if [ -z $3 ]
+then
+	kym=${kym}"scroll\""
+else
+	kym=${kym}${3}"\""
+fi
+
+$kym
+
+mkdir /home/$USER/.config /home/$USER/.config/autostart &>/dev/null
+filename="/home/$USER/.config/autostart/keyswap.desktop"
+echo "[Desktop Entry]" > "$filename"
+echo "Encoding=UTF-8" >> "$filename"
+echo "Version=0.9.4" >> "$filename"
+echo "Type=Application" >> "$filename"
+echo "Name=KeyMap" >> "$filename"
+echo "Exec=${kym}" >> "$filename"
+echo "StartupNotify=false" >> "$filename"
+echo "Terminal=false" >> "$filename"
+echo "Hidden=false" >> "$filename"
+exit
