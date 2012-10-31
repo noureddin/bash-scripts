@@ -1,0 +1,17 @@
+ KeySwapper, the easy way to make your keyboard multilingual
+  this is a shell script to generate a setxkbmap line and make it "autostart"
+  Usage:
+    ./keyswap layout1,layout2,..,layoutN switch_keys indicator_led
+    Example:
+    ./keyswap us,ru,ara alt_shift scroll
+     To use "us" and "ru" and "ara" layouts, and switch between them (toggle) using "alt"
+     and "shift", and turn on "scroll" led when the current layout is NOT the first.
+    Notes:
+     If you didn't choose switch_keys or indicator_led, It'd be "alt_shift" and "scroll"
+     If you don't want the led, You may type "none", like:
+      ./keyswap us,ru,ara alt_shift none
+
+If you found any bugs or have any suggestions:
+Contact me at : noureddin95 at gmail dot com
+
+License: Waqf GPL http://www.ojuba.org/wiki/waqf/license

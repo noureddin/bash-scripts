@@ -1,5 +1,7 @@
 #!/bin/bash
 # a shell script to generate a setxkbmap line and make it "autostart"
+#If you found any bugs or have any suggestions:
+#Contact me at : noureddin95 at gmail dot com
 #the path '~/' prints error, so replaced by '/home/$USER/'
 if [ -z "$1" ] || [ "$1" == "-h" ]
 then
@@ -34,14 +36,14 @@ fi
 $kym
 
 mkdir /home/$USER/.config /home/$USER/.config/autostart &>/dev/null
-filename="/home/$USER/.config/autostart/keyswap.desktop"
-echo "[Desktop Entry]" > "$filename"
-echo "Encoding=UTF-8" >> "$filename"
-echo "Version=0.9.4" >> "$filename"
-echo "Type=Application" >> "$filename"
-echo "Name=KeyMap" >> "$filename"
-echo "Exec=${kym}" >> "$filename"
-echo "StartupNotify=false" >> "$filename"
-echo "Terminal=false" >> "$filename"
-echo "Hidden=false" >> "$filename"
+
+echo "[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=KeyMap
+Exec=${kym}
+StartupNotify=false
+Terminal=false
+Hidden=false" > "/home/$USER/.config/autostart/keyswap.desktop"
 exit
