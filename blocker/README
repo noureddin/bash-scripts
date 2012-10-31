@@ -3,7 +3,7 @@ README for Blocker
  Application Blocker for Unix-like systems
   You can use this script to block any application.
   It -Simply- chmod 000 the application you want.
-  Its returns its permissions when you "allow" it.
+  And returns its permissions when you "allow" it.
 
 Installation:
 	 sudo ./blocker -i
@@ -22,10 +22,12 @@ Usage:
 	List:
 	 sudo blocker -l  #to list all
 	 sudo blocker -ll #to list all but one per line
+	Allow All Blocked Applications:
+	 sudo blocker -aa
 	Help:
 	 sudo blocker
 
-Thanks to Mohamed Mohsen (linuxer9) for suggestions
+Thanks to All LinuxAC.org members and the entire Open Source World :)
 
-Contact me : noureddin95 at gmail dot com
+Feel free to contact me : noureddin95 at gmail dot com
 License: Waqf GPL http://www.ojuba.org/wiki/waqf/license

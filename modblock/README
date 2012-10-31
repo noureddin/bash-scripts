@@ -1,6 +1,6 @@
 README for modblock
 
- Kernel Module Blocker for Unix-like systems (Now Debian Only)
+ Kernel Module Blocker for Unix-like systems (Still Under Testing)
   You can use this script to block any kernel module.
 
 Installation:
@@ -26,7 +26,7 @@ Usage:
 	Help:
 	 sudo modblock
 
-Thanks to Mohamed Mohsen (linuxer9) for suggestions
+Thanks to all LinuxAC.org members and the entire Open Source World :)
 
 Feel free to contact me : noureddin95 at gmail dot com
 License: Waqf GPL http://www.ojuba.org/wiki/waqf/license

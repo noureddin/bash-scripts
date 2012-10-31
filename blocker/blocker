@@ -99,7 +99,7 @@ do
 		do
 			chmod ${i[1]} ${i[0]} #it's stored "/path perm" and allowed by "chmod perm /path"
 		done
-		echo -n >"$blst" #to empty the blacklist and '-n' is to prevent printing newline
+		echo -n >"$blst" #to empty the blacklist and '-n' is to avoid printing newline
 		continue
 	elif [ "$a" == "-l" ] #list all blocked apps
 	then
@@ -162,7 +162,7 @@ do
 			else
 				killall -q `echo ${file}|sed 's/.*\///'` #to kill the appname not the fullpath
 				echo "${file} ${mod}" >> "$blst" #add it to the blacklist
-				chmod 000 $file #make the app unaccessible
+				chmod 0000 $file #make the app unaccessible
 				echo blocked $file
 			fi
 		done
@@ -179,7 +179,7 @@ do
 				chmod $perm $file #return the stolen permissions :D
 				echo allowed $file
 				file=${file//$'/'/$'\/'} #replace '/' with '\/' to avoid problems with 'sed'
-				sed "/$file/d" $blst > ${blst}.save #remove the app from blacklist 
+				sed "/$file/d" $blst > ${blst}.save #remove the app from blacklist
 				mv ${blst}.save ${blst} #we can't save to the same file, so we did this trick ;)
 			fi
 		done
