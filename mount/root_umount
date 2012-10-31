@@ -1,5 +1,5 @@
 #!/bin/bash
-#Not recommends for use
+#Not recommended for use
 #this unmounts all partitions
 umount -a &>/dev/null
 rmdir /media/* &>/dev/null

@@ -1,5 +1,5 @@
 #!/bin/bash
-#add this script to /etc/rc.local before "exit 0" line.
+#add this script to /etc/rc.local before "exit 0" line, to mount all partitions while booting
 a=$(ls /dev/sd*)
 for i in $a
 do

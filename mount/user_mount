@@ -5,7 +5,7 @@ do
 	if [ "${#i}" -ge 9 ]
 	then
 		b=`echo ${b} ${i}`
-	fi	
+	fi
 done
 c=(${b})
 d=${#c}
@@ -21,3 +21,4 @@ done
 #do
 #	udisks --mount $i &>/dev/null
 #done
+#'mountall' does the same mission and can be used by both user and root
