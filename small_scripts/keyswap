@@ -35,7 +35,7 @@ fi
 
 $kym
 
-mkdir /home/$USER/.config /home/$USER/.config/autostart &>/dev/null
+mkdir $HOME/.config $HOME/.config/autostart &>/dev/null
 
 echo "[Desktop Entry]
 Encoding=UTF-8
@@ -45,5 +45,5 @@ Name=KeyMap
 Exec=${kym}
 StartupNotify=false
 Terminal=false
-Hidden=false" > "/home/$USER/.config/autostart/keyswap.desktop"
+Hidden=false" > "$HOME/.config/autostart/keyswap.desktop"
 exit

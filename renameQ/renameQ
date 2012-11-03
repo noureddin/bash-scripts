@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#read sQ
+#for i in 001 114
+#mv $i.mp3 $i-${sQ[$i]}.mp3
+sq=`cat $HOME/sQ`
+sq=( 0 $sq )
+for ((i=1;i<115;i++))
+do
+	if [ ${#i} -lt 3 ]
+	then
+		n=`printf "0%.0s" $(seq \`expr 3 - ${#i}\`)`$i
+	else
+		n=$i
+	fi
+	mv $n.mp3 $n-${sq[$i]}.mp3
+done

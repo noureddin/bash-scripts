@@ -1,0 +1,4 @@
+#!/bin/bash
+#compile and run small c scripts :)
+make $1 >/dev/null
+./$1

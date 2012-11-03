@@ -8,14 +8,16 @@ function echohelp {
 		echo '
  Application Blocker for Unix-like systems
   You can use this script to block any application.
-  It -Simply- chmod 000 the application you want,
-  And returns its permissions when you "allow" it.
+  It -Simply- does chmod 000 to the application you want
+  to block, and returns its permissions when you "allow" it.
   Usage:
 	-b [app] #to block any application
 	-a [app] #to allow any blocked application
 	-aa      #to allow ALL blocked application
 	-l       #to list all blocked applications
-	-ll      #like previous but application per line
+	-lc      #like previous but `compact` not `per line`
+	-la      #to list all non-blocked applications
+	-lac     #like previous but `compact` not `per line`
 	-i       #to install this application to your system
 	any thing else
 	         #to show this help ;)
@@ -24,12 +26,16 @@ function echohelp {
 	fi
 }
 
+if [ -z "$1" ];then
+	echohelp;fi
+
 blst="/etc/blocker" #blacklist file
 touch $blst #to stop errors if not found ;)
 chmod 0777 $blst #to allow it to use (we chmod 0000 it before end
 #to prevent others from reading what we had blocked ;) )
 path=`echo $PATH|sed 's/:/ /g'` #replace ":" by space to make $PATH an array
 #(for bash, arrays can be strings separated by spaces, like "hi i am an human")
+#and the 'g' at the end of 'sed' is to replace all
 
 function permconv { #when you use chmod you can't use the '-rwxr-xr-x' form directly,
 #so this function converts it to the numerical form: '0755'
@@ -73,12 +79,30 @@ function permconv { #when you use chmod you can't use the '-rwxr-xr-x' form dire
 }
 
 function list {
-	if [ "$1" == "line" ]
+	if [ "$1" == "compact" ] #to list blocked apps only (doesn't print: 'No Applications/Commands were blocked', to facilitate using it in an application
 	then
-		sed 's/[ ].*//' $blst|sed 's/\/.*\///'
-	else
-		blkapp=`sed 's/[ ].*//' $blst|sed 's/\/.*\///'`
-		echo $blkapp
+		echo `sed 's/.* //' $blst|sed 's/\/.*\///'`
+	elif [ "$1" == "allow" ]
+	then
+		all=`	for i in $path
+			do
+				ls $i 2>/dev/null
+			done|sed 's/\ /\n/g'|sort|uniq`
+			# 2>/dev/null to print results only not errors
+		if [ -s $blst ] #check if list not empty
+		then
+			all=`echo $all|grep -v "\`grep -v '^$' $blst|sed 's/.* //'\`"`
+			#to remove blocked apps from the list, to print only the non-blocked apps
+		else
+			if [ "$2" == "compact" ]
+			then
+				echo $all
+			else
+				echo $all|sed 's/\ /\n/g'
+			fi
+		fi
+	else #to list blocked apps but 'per line'
+		sed 's/.* //' $blst|sed 's/\/.*\///'
 	fi
 }
 
@@ -97,17 +121,26 @@ do
 		grep -v '^$' $blst | #we don't want empty lines :P
 		while read i #read each line in blacklist
 		do
-			chmod ${i[1]} ${i[0]} #it's stored "/path perm" and allowed by "chmod perm /path"
+			chmod $i #because it's stored 'perm /path' to facilitate re-chmod it
+			echo Allowed all blocked application
 		done
 		echo -n >"$blst" #to empty the blacklist and '-n' is to avoid printing newline
 		continue
-	elif [ "$a" == "-l" ] #list all blocked apps
+	elif [ "$a" == "-l" ] #list all blocked apps - per line
 	then
 		list
 		continue
-	elif [ "$a" == "-ll" ] #list all blocked apps - app per line
+	elif [ "$a" == "-lc" ] #list all blocked app - compact
 	then
-		list line
+		list compact
+		continue
+	elif [ "$a" == "-la" ] #list all non-blocked apps - per line
+	then
+		list allow
+		continue
+	elif [ "$a" == "-lac" ] #list all blocked apps - compact
+	then
+		list allow compact
 		continue
 	elif [ "$a" == "-i" ] #install
 	then
@@ -132,10 +165,9 @@ do
 	do
 		if [ -e "${dir}/${a}" ] #if app found in this dir
 		then
-			type=`ls -l "${dir}/${a}"|sed "s/[ ].*//"`
-			if [ ${type:0:1} == "l" ] #if app is just a link
+			if [ -L "${dir}/${a}" ] #if app is just a link
 			then
-				link=`ls -l ${dir}/${a}|sed "s/.*[ ]//"` #get the path of original app
+				link=`ls -l ${dir}/${a}|sed "s/.* //"` #get the path of original app
 				if [ ${link:0:1} != '/' ];then #if it's NOT full path
 					link="${dir}/${link}";fi #make it full path
 				if [ -e "$link" ];then #if it exists, to avoid any errors
@@ -155,13 +187,13 @@ do
 	then
 		for file in $found #if found in many directories
 		do
-			mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\`` #get the current file permissions
+			mod=`permconv \`ls -l ${file}|sed "s/ .*//"\`` #get the current file permissions
 			if [ "$mod" == "0000" ]
 			then
 				echo "${file} is already blocked or have not any permissions"
 			else
 				killall -q `echo ${file}|sed 's/.*\///'` #to kill the appname not the fullpath
-				echo "${file} ${mod}" >> "$blst" #add it to the blacklist
+				echo "${mod} ${file}" >> "$blst" #add it to the blacklist
 				chmod 0000 $file #make the app unaccessible
 				echo blocked $file
 			fi
@@ -170,13 +202,12 @@ do
 	then
 		for file in $found #if found in many directories
 		do
-			mod=`permconv \`ls -l ${file}|sed "s/[ ].*//"\`` #get the current file permissions
+			mod=`permconv \`ls -l ${file}|sed "s/ .*//"\`` #get the current file permissions
 			if [ "$mod" != "0000" ] || [ "`grep ${file} ${blst}`" == '' ]
 			then
 				echo "${file} is not blocked or not found in blocked list"
 			else
-				perm=`grep $file $blst|sed 's/.*[ ]//'` #get the original file permissions from blacklist
-				chmod $perm $file #return the stolen permissions :D
+				chmod `grep $file $blst` #it's sorted 'perm /path' to faciltate re-chomd it
 				echo allowed $file
 				file=${file//$'/'/$'\/'} #replace '/' with '\/' to avoid problems with 'sed'
 				sed "/$file/d" $blst > ${blst}.save #remove the app from blacklist

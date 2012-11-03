@@ -43,7 +43,6 @@ function list {
 			lsmod|grep -v Module|sed 's/[ ].*//'
 			#if we used the last line and the blacklist was empty, it would print nothing
 		fi
-		exit
 	else
 		echo "Modules on System:"
 		a=`lsmod|grep -v Module|sed 's/[ ].*//'` #grep -v Module to remove the table header ;)
