@@ -1,34 +1,22 @@
 #!/bin/bash
 function replacestr {
+	#to replace the 'replace' command from mysql ;)
 	#replace from to [from to] ... -- file1 [file2] ...
 	#first: split input into two arrays: replacements and files
 	rep=$(echo $@|sed 's/ -- .*//')
+	rep=($rep)
 	fil=$(echo $@|sed 's/.* -- //')
 	#now we'll replace rep[0] with rep[1] in fil[0] and so on
 	for ((i=0;i<${#fil[@]};i++))
 	do
 		file=${fil[$i]}
 		index=`expr $i \* 2`
-		rep1=`getsplited $index $rep` #couldn't use ${rep[$index]}
-		rep2=`getsplited \`expr $index + 1\` $rep` #because ${rep[0]} returnes the entire array
-		sed "s/$rep1/$rep2/" ${file} > ${file}.rep
-		mv ${file}.rep ${file}
+		rep1=${rep[$index]}
+		rep2=${rep[`expr $index + 1`]}
+		sed "s/$rep1/$rep2/" ${file} > ${file}.rep #replace the strings in the file
+		mv ${file}.rep ${file} #we can't save to the same file, so we did this trick ;)
 	done
 
 }
 
-function getsplited {
-	a=${@:2}
-	z=0
-	for i in ${a[@]}
-	do
-		if [ "$z" == "$1" ]
-		then
-			getsplited=$i
-			break
-		fi
-		z=`expr $z + 1`
-	done
-	echo $getsplited
-}
 replacestr $@

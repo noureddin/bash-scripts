@@ -1,6 +1,16 @@
 #!/bin/bash
-#run with 'root' because of `blkid`
 #example: sudo ./getuuid /dev/sda1 or even sudo ./getuuid sda1
-blkid|grep $1|sed 's/.*UUID="\([^"]\+\)".*/\1/'
+#it had to be used by root because of 'blkid',
+#CODE: blkid|grep $1|sed 's/.*UUID="\([^"]\+\)".*/\1/'
 #You can replace UUID with TYPE or LABEL
 #If LABEL not found, It returns all the string which starts with '/dev/sd...'
+
+#but I modified it to be used by any user
+#UUID:
+ls -l /dev/disk/by-uuid/*|grep $1|sed 's/.*\/by-uuid\/\([^ ]\+\).*/\1/'
+#LABEL:
+#ls -l /dev/disk/by-label/*|grep $1|sed 's/.*\/by-label\/\([^ ]\+\).*/\1/'
+#It will return nothing if the partition not labeled, not like the blkid line
+#TYPE: Still ...
+
+
