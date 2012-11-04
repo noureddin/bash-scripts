@@ -2,7 +2,7 @@
 # a shell script to generate a setxkbmap line and make it "autostart"
 #If you found any bugs or have any suggestions:
 #Contact me at : noureddin95 at gmail dot com
-#the path '~/' prints error, so replaced by '/home/$USER/'
+#the path '~/' returns error, so replaced by '$HOME/'
 if [ -z "$1" ] || [ "$1" == "-h" ]
 then
 	echo "
@@ -16,7 +16,10 @@ then
     Note:
      If you didn't choose switch_keys or indicator_led, It\'d be \"alt_shift\" and \"scroll\"
 "
-exit
+	exit
+elif [ "$1" == "-a" ] #not mentioned in help because it need some improvements ;)
+then
+	cat /usr/X11R6/share/X11/xkb/rules/base.lst
 fi
 kym="setxkbmap -layout \"$1\" -option \"grp:"
 if [ -z $2 ]
