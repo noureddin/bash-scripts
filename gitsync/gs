@@ -30,6 +30,6 @@ if [ -z "$2" ]
 then
 	git commit -a -m "Update - `date +'%a %d/%m/%Y %R'`"
 else
-	git commit -a -m ${@:2}
+	git commit -a -m "${@:2}"
 fi
 git push origin master
