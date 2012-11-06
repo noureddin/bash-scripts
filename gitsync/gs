@@ -11,9 +11,11 @@ Installation
 Usage
   Form: gs [dir] [commit]
   *Note: You should have already installed 'git' and git repo
-  If you are already in your local repo, just execute 'gs' and wait to calculate files and enter your username and password.  
-  If you are in another directory and want to sync your git, just execute 'gs' followed by your local git directory.
-  You can use specified commit title intead of 'Updated' followed by the date
+  If you are already in your local repo, just execute 'gs' or 'gs .' and
+   wait to calculate files and enter your username and password.
+  If you are in another directory and want to sync your git, just execute 'gs'
+   followed by your local git directory.
+  You can use specified commit title instead of 'Updated' followed by the date.
 
 Taken from https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd and modified by me :)
 "
