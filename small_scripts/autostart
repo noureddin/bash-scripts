@@ -34,8 +34,8 @@ fi
 mkdir $HOME/.config $HOME/.config/autostart &>/dev/null
 
 appdir="/usr/share/applications"
-#atodir="${XDG_CONFIG_HOME:-~/.config}/autostart"
 atodir="$HOME/.config/autostart"
+
 for a in $@
 do
 	if [ "$a" == "-a" ] #add to autostart
@@ -86,9 +86,8 @@ do
 			rm $atodir/$a.desktop
 			echo $a removed from autostart
 		else
-			echo $a not autostart, try \"autostart -la\"
+			echo $a not found in autostart, try \"autostart -la\"
 		fi
 	fi
 done
-
 exit
