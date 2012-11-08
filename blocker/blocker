@@ -26,8 +26,11 @@ function echohelp {
 	fi
 }
 
-if [ -z "$1" ];then
-	echohelp;fi
+if [ -z "$1" ]
+then
+	echohelp
+	exit
+fi
 
 blst="/etc/blocker" #blacklist file
 touch $blst #to stop errors if not found ;)
