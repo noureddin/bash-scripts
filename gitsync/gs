@@ -1,5 +1,7 @@
 #!/bin/bash
 #From: https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd
+#TODO: Support commit msg with spaces and without (")s
+
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]
 then
 	echo "
