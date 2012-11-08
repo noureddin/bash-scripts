@@ -4,4 +4,5 @@ a=$(ls /dev/sd*)
 for i in $a
 do
 	udisks --mount $i --mount-options umask=0 &>/dev/null
+	udisks --mount $i &>/dev/null
 done
