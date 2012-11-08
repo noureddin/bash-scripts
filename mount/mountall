@@ -1,8 +1,18 @@
 #!/bin/bash
 #add this script to /etc/rc.local before "exit 0" line, to mount all partitions while booting
+#This can run by normal user, but some distros need root acces to mount any thing
+
 a=$(ls /dev/sd*)
 for i in $a
 do
-	udisks --mount $i --mount-options umask=0 &>/dev/null
-	udisks --mount $i &>/dev/null
+	t=`/sbin/blkid $i|sed 's/.*TYPE="\([^"]\+\)".*/\1/'`
+	if [ -z "$t" ] || [ "$t" == "swap" ]
+	then
+		continue
+	elif [ "$t" == "vfat" ] || [ "$t" == "ntfs" ] || [ "$t" == "ntfs-3g" ]
+	then
+		udisks --mount $i --mount-options umask=0 &>/dev/null
+	else
+		udisks --mount $i &>/dev/null
+	fi
 done

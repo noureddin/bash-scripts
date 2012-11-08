@@ -1,16 +1,14 @@
 #!/bin/bash
-#example: sudo ./getuuid /dev/sda1 or even sudo ./getuuid sda1
-#it had to be used by root because of 'blkid',
-#CODE: blkid|grep $1|sed 's/.*UUID="\([^"]\+\)".*/\1/'
+#example: ./getuuid /dev/sda1 or even sudo ./getuuid sda1
+
+#At last I found that we can use 'blkid' as usual user to show partitions info
+/sbin/blkid|grep $1|sed 's/.*UUID="\([^"]\+\)".*/\1/'
 #You can replace UUID with TYPE or LABEL
 #If LABEL not found, It returns all the string which starts with '/dev/sd...'
 
-#but I modified it to be used by any user
+#Another Way for UUID and LABEL
 #UUID:
-ls -l /dev/disk/by-uuid/*|grep $1|sed 's/.*\/by-uuid\/\([^ ]\+\).*/\1/'
+#ls -l /dev/disk/by-uuid/*|grep $1|sed 's/.*\/by-uuid\/\([^ ]\+\).*/\1/'
 #LABEL:
 #ls -l /dev/disk/by-label/*|grep $1|sed 's/.*\/by-label\/\([^ ]\+\).*/\1/'
 #It will return nothing if the partition not labeled, not like the blkid line
-#TYPE: Still ...
-
-
