@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# Shutdown, Restart, Suspend, or Hibernate the computer without sudo!
+# Forked from https://gist.github.com/988104 to support delaying :)
+
+usage() {
+    echo "
+ UserPower is a simple way to shutdown, restart, suspend,
+  or hibernate the computer without being root.
+ Usage:
+  $0 shutdown|restart|suspend|hibernate [minutes]
+"
+    exit
+}
+
+if [ $# -ne 1 ] ; then
+    usage
+elif [ ! -z "$2" ] ; then
+    sleep `expr $1 \* 60`
+fi
+
+THINGY_UPOWER="dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower"
+THINGY_CONSOLEKIT="dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager"
+case $1 in
+shutdown)
+    $THINGY_CONSOLEKIT org.freedesktop.ConsoleKit.Manager.Stop
+;;
+restart)
+    $THINGY_CONSOLEKIT org.freedesktop.ConsoleKit.Manager.Restart
+;;
+suspend)
+    $THINGY_UPOWER org.freedesktop.UPower.Suspend
+;;
+hibernate)
+    $THINGY_UPOWER org.freedesktop.UPower.Hibernate
+;;
+*)
+    usage
+;;
+esac
+
+exit
