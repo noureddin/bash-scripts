@@ -1,0 +1,11 @@
+#!/bin/bash
+# FROM:http://blog.anantshri.info/howto-add-ppa-in-debian/
+# Modified to add GPG Keys only, you may look at 'add-apt-ppa'
+# at https://github.com/noureddin/bash-scripts/tree/master/small_scripts
+
+NM=`uname -a && date`
+NAME=`echo $NM | md5sum | cut -f1 -d" "`
+apt-get update >> /dev/null 2> /tmp/${NAME}_apt_add_key.txt
+key=`cat /tmp/${NAME}_apt_add_key.txt | cut -d":" -f6 | cut -d" " -f3`
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $key
+rm -rf /tmp/${NAME}_apt_add_key.txt

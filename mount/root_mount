@@ -1,14 +1,8 @@
 #!/bin/bash
 #mount all mountable partitions like udisks but with 'root' account and mount as /media/drive or /C and /D :)
-#Note: All that can be easily done by:
-#a=$(ls /dev/sd*)
-#for i in $a
-#do
-#	udisks --mount $i --mount-options umask=0 &>/dev/null
-#done
-#You will find it in "mountall" in the same directory
-#The following script needs some correction in the part of excluding filesystem partitons.
 #RECOMMENDATION: Use 'mountall' which exists in the same directory :)
+#The following script needs some correction in the part of excluding filesystem partitons.
+
 if [ "$1" != "m" ] && [ "$1" != "c" ] && [ "$1" != "mc" ]
 then
 	echo '''
