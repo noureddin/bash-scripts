@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Prints the number of upgradable packages
+# If 'all' is appended to the command, It'll print the whole
+#  line of upgrading state.
+# Notes:
+#  * Run with root (sudo, su -c, etc).
+#  * It works with APT only.
+
+if [ "$1" == "all" ] ; then
+	apt-get upgrade --assume-no | grep "not upgraded"
+else
+	apt-get upgrade --assume-no | grep "not upgraded" | sed 's/ .*//'
+fi
