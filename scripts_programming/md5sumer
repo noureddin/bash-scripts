@@ -1,0 +1,26 @@
+#!/bin/bash
+#md5sum recursively
+
+if [ -z "$1" ] ; then
+	cd . #to avoid problems ;)
+else
+	cd $1
+fi
+
+all=`ls -R`
+for i in $all
+do
+	if [ "${i:0:1}" == "." ] ; then
+		if [ "$i" == ".:" ] ; then
+			continue
+		else
+			dir=`echo ${i:2} | sed 's/.$//'`
+			continue
+		fi
+	fi
+	if [ -z "$dir" ] ; then
+		md5sum $i 2>/dev/null
+	else
+		md5sum $dir/$i 2>/dev/null
+	fi
+done
