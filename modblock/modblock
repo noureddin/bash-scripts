@@ -13,7 +13,9 @@ function echohelp {
 	-l       #to list all "Modules on System" and "Blocked Modules"
 	-lc      #like previous but compact
 	-lb      #to list only blocked modules
+	-lbc      #like previous but compact
 	-la      #to list only non-blocked modules
+	-lac      #like previous but compact
 	-u       #use it when you finish to probe all modules and update your initrd
 	-i       #to install this application to your system
 	-aa      #to empty the blacklist and allow all blocked modules
@@ -27,50 +29,53 @@ function echohelp {
 blst='/etc/modprobe.d/modblock.conf' #blacklist file
 touch $blst #to stop errors if not found ;)
 
+function if_compact { # if the first parameter is "compact" then echo if with spaces not lines
+        if [ "$1" == "compact" ] ; then
+                echo ${@:2}
+        else
+                echo ${@:1}| sed 's/\ /\n/g'
+        fi
+}
+
+function all_compact { # like 'if_compact' but with margins
+	if [ "$1" == "compact" ];then
+		echo "  "${@:2} #add margin
+	else
+		for i in ${@:1}
+		do
+			echo "  $i"
+		done
+	fi
+}
+
 function list {
 
 	if [ "$1" == "blocked" ] #to list blocked modules only (doesn't print: 'No moudels were blocked', to facilitate using it in an application
 	then
-		grep -v '^$' $blst|sed 's/.*[ ]//' # the grep cmd here to remove any empty lines
-		exit
+		if_compact $2 `grep -v '^$' $blst | sed 's/.*[ ]//' | sort` # the grep cmd here to remove any empty lines
 	elif [ "$1" == "allowed" ]
 	then
 		if [ -s $blst ] #check if list not empty
 		then
-			lsmod|grep -v Module|sed 's/[ ].*//'|grep -v "`grep -v '^$' $blst|sed 's/.*[ ]//'`"
+			if_compact $2 `lsmod|grep -v Module | sed 's/[ ].*//' | grep -v "\`grep -v '^$' $blst | sed 's/.*[ ]//'\`" | sort`
 			#to remove blocked modules from the list, to print only the non-blocked modules
 		else
-			lsmod|grep -v Module|sed 's/[ ].*//'
-			#if we used the last line and the blacklist was empty, it would print nothing
+			if_compact $2 `lsmod|grep -v Module | sed 's/[ ].*//' | sort`
+			#if we used the previous line and the blacklist was empty, it would print nothing
 		fi
 	else
 		echo "Modules on System:"
-		a=`lsmod|grep -v Module|sed 's/[ ].*//'` #grep -v Module to remove the table header ;)
-		if [ "$1" == "compact" ];then
-			echo "  "$a #add margin
-		else
-			for i in $a
-			do
-				echo "  $i"
-			done
-		fi
-	
-		echo
-		echo "Blocked Modules:"
-		a=`grep -v '^$' $blst|sed 's/.*[ ]//'`
-		if [ -z "$a" ];then
-			echo "  No modules were blocked";fi
-		if [ "$1" == "compact" ];then
-			echo $a
-		else
-			for i in $a
-			do
-				echo "  $i"
-			done
-		fi
-	fi
+		all_compact $1 `lsmod|grep -v Module|sed 's/[ ].*//' | sort` #grep -v Module to remove the table header ;)
 
+		echo # print new line
+		echo "Blocked Modules:"
+		a=`grep -v '^$' $blst|sed 's/.*[ ]//' | sort`
+		if [ -z "$a" ] ; then
+			echo "  No modules were blocked";fi
+		all_compact $1 $a
+	fi
 }
+
 for a in $@
 do
 	if [ "$a" == "-b" ] #block
@@ -93,9 +98,17 @@ do
 	then
 		list blocked
 		continue
+	elif [ "$a" == "-lbc" ] #list blocked compact
+	then
+		list blocked compact
+		continue
 	elif [ "$a" == "-la" ] #list allowed
 	then
 		list allowed
+		continue
+	elif [ "$a" == "-lac" ] #list blocked compact
+	then
+		list allowed compact
 		continue
 	elif [ "$a" == "-u" ] #probe modules and update initrd
 	then
