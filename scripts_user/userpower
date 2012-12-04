@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Shutdown, Restart, Suspend, or Hibernate the computer without sudo!
+# Logout, Shutdown, Restart, Suspend, or Hibernate the computer without sudo!
 # Forked from https://gist.github.com/988104 to support delaying and more :)
 
 usage() {
