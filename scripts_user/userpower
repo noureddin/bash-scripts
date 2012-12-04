@@ -1,14 +1,14 @@
 #!/bin/bash
 
 # Shutdown, Restart, Suspend, or Hibernate the computer without sudo!
-# Forked from https://gist.github.com/988104 to support delaying :)
+# Forked from https://gist.github.com/988104 to support delaying and more :)
 
 usage() {
     echo "
- UserPower is a simple way to shutdown, restart, suspend
-  or hibernate the computer without being root.
- Usage:
-  $0 shutdown|restart|suspend|hibernate [minutes]
+ UserPower is a simple way to logout, shutdown, restart, suspend
+  or hibernate the computer without being root or use gui.
+   Usage:
+  $0 logout|shutdown|restart|suspend|hibernate [minutes]
 "
     exit
 }
@@ -22,20 +22,24 @@ fi
 THINGY_UPOWER="dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower"
 THINGY_CONSOLEKIT="dbus-send --system --print-reply --dest=org.freedesktop.ConsoleKit /org/freedesktop/ConsoleKit/Manager"
 case $1 in
+logout)
+	echo Going to $1 now ...
+    killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
+;;
 shutdown)
-	echo Going to shutdown now ...
+	echo Going to $1 now ...
     $THINGY_CONSOLEKIT org.freedesktop.ConsoleKit.Manager.Stop >/dev/null
 ;;
 restart)
-        echo Going to restart now ...
+        echo Going to $1 now ...
     $THINGY_CONSOLEKIT org.freedesktop.ConsoleKit.Manager.Restart >/dev/null
 ;;
 suspend)
-        echo Going to suspend now ...
+        echo Going to $1 now ...
     $THINGY_UPOWER org.freedesktop.UPower.Suspend >/dev/null
 ;;
 hibernate)
-        echo Going to hibernate now ...
+        echo Going to $1 now ...
     $THINGY_UPOWER org.freedesktop.UPower.Hibernate >/dev/null
 ;;
 *)
