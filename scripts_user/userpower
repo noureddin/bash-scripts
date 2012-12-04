@@ -1,14 +1,15 @@
 #!/bin/bash
 
-# Logout, Shutdown, Restart, Suspend, or Hibernate the computer without sudo!
+# Shutdown, Restart, Suspend, or Hibernate the computer, and more, without sudo!
 # Forked from https://gist.github.com/988104 to support delaying and more :)
 
 usage() {
     echo "
- UserPower is a simple way to logout, shutdown, restart, suspend
-  or hibernate the computer without being root or use gui.
+ UserPower is a simple way to Shutdown, Restart, Suspend
+  or Hibernate the computer, and more, without being root
+  or use difficult GUI.
    Usage:
-  $0 logout|shutdown|restart|suspend|hibernate [minutes]
+  $0 logout|lockscreen|shutdown|restart|suspend|hibernate [minutes]
 "
     exit
 }
@@ -25,6 +26,10 @@ case $1 in
 logout)
 	echo Going to $1 now ...
     killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
+;;
+lockscreen)
+	echo Going to $1 now ...
+    for i in `ls /usr/bin/*screensaver`; do if [ ! -z `pidof $i` ] ; then ${i}-command -l ; fi ;done >/dev/null
 ;;
 shutdown)
 	echo Going to $1 now ...
