@@ -4,7 +4,7 @@ function replacestr {
 	#replace from to [from to] ... -- file1 [file2] ...
 	#first: split input into two arrays: replacements and files
 	rep=$(echo $@|sed 's/ -- .*//')
-	rep=($rep)
+	rep=($rep) # change it to an array
 	fil=$(echo $@|sed 's/.* -- //')
 	#now we'll replace rep[0] with rep[1] in fil[0] and so on
 	for ((i=0;i<${#fil[@]};i++))

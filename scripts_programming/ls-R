@@ -1,0 +1,52 @@
+#!/bin/bash
+# The New Generation of "ls -R"
+# prints all files with related paths from the directory you want
+# Usage:
+#   ls-R /home
+#  You can use 'ls' parameters also,but the diectory must be the first, 
+#   If the directory is the current use '.' instead.
+#   ls-R . -A
+# Note: Directories aren't printed.
+
+if [ -z "$1" ] ; then
+	cd . #to avoid problems ;)
+else
+	cd $1
+fi
+
+# ls ${@:1} -R | grep ^..*:$ |
+# sed 's/^.\///' | sed 's/:$//' |
+# while read dir
+# do
+# 	cd "$dir"
+# 	ls ${@:1} |
+# 	while read file
+# 	do
+# 		if [ ! -d "$file" ]
+# 		then
+# 			echo $dir/$file
+# 		fi
+# 	done
+# done
+function echofile {
+#	if [ -e "$@" ] && [ ! -d "$@" ] ; then
+	if [ ! -d "$@" ] ; then
+		echo $@
+	fi
+}
+
+ls ${@:2} -R | while read i
+do
+	if [ "${i:0:2}" == "./" ] ; then
+		dir=`echo ${i:2} | sed 's/.$//'`
+		continue
+	elif [ "$i" == ".:" ] ; then
+		continue
+	fi
+
+	if [ -z "$dir" ] ; then
+		echofile $i
+	else
+		echofile $dir/$i
+	fi
+done

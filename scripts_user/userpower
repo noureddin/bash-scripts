@@ -6,8 +6,8 @@
 usage() {
     echo "
  UserPower is a simple way to Shutdown, Restart, Suspend
-  or Hibernate the computer, and more, without being root
-  or use difficult GUI.
+  or Hibernate the Computer, and more, without being root
+  or using difficult GUI.
    Usage:
   $0 logout|lockscreen|shutdown|restart|suspend|hibernate [minutes]
 "

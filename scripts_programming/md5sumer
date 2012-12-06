@@ -1,14 +1,13 @@
 #!/bin/bash
-#md5sum recursively
+# md5sum recursively
 
-if [ -z "$1" ] ; then
+if [ -z "$@" ] ; then
 	cd . #to avoid problems ;)
 else
-	cd $1
+	cd $@
 fi
 
-all=`ls -R`
-for i in $all
+ls -R | while read i
 do
 	if [ "${i:0:1}" == "." ] ; then
 		if [ "$i" == ".:" ] ; then

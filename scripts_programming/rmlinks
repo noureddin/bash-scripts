@@ -1,0 +1,33 @@
+#!/bin/bash
+#remove all links recursively
+
+if [ -z "$1" ] ; then
+	cd . #to avoid problems ;)
+else
+	cd $1
+fi
+
+function rmlink {
+	a=`ls -l "$@"` 2>/dev/null
+	if [ "${a:0:1}" == "l" ]
+	then
+		rm "$@" 2>/dev/null
+	fi
+}
+
+ls -R 2>/dev/null | while read i
+do
+	if [ "${i:0:2}" == "./" ] ; then
+		dir=`echo ${i:2} | sed 's/.$//'`
+		continue
+	elif [ "$i" == ".:" ] ; then
+		continue
+	fi
+
+	if [ -z "$dir" ] ; then
+		rmlink "$i"
+	else
+		rmlink "$dir/$i"
+	fi
+done
+exit

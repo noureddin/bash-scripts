@@ -1,0 +1,11 @@
+#!/bin/bash
+# list all directories
+
+if [ -z "$@" ] ; then
+	cd . #to avoid problems ;)
+else
+	cd $@
+fi
+
+ls ${@:2} -R | grep ^..*:$ |
+sed 's/^.\///' | sed 's/:$//'
