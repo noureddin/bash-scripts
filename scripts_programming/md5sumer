@@ -7,7 +7,8 @@ else
 	cd $@
 fi
 
-ls -R | while read i
+a=$(ls -R)
+for i in $a
 do
 	if [ "${i:0:1}" == "." ] ; then
 		if [ "$i" == ".:" ] ; then
