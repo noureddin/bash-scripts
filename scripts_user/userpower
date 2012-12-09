@@ -51,7 +51,7 @@ switchuser)
 	echo Going to $1 now ...
     for i in `ls /usr/sbin/*dm`; do if [ ! -z "`pidof $i`" ] ; then case $i in
     /usr/sbin/lightdm)dm-tool switch-to-greeter;;
-    /usr/sbin/mdm)mdmflexiserver;; # Not tested yet
+    /usr/sbin/mdm)mdmflexiserver;;
     /usr/sbin/gdm)gdmflexiserver;; # Not tested yet
     *)echo "Sorry, Your Display Manager is not supported yet.";;
     esac
