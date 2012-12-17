@@ -1,6 +1,8 @@
 #!/bin/bash
 # md5sum recursively
 
+# md5summer .. | grep -v `pwd|sed 's/.*\///'` > md5sums # create the md5sums file in 'DEBIAN' directory in a 'deb' package ;)
+
 if [ -z "$@" ] ; then
 	cd . #to avoid problems ;)
 else

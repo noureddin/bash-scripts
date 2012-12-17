@@ -1,0 +1,27 @@
+#!/bin/bash
+# get size of a directory
+
+if [ -z "$@" ] ; then
+	cd . #to avoid problems ;)
+else
+	cd $@
+fi
+s=0
+a=$(ls -R)
+for i in $a
+do
+	if [ "${i:0:1}" == "." ] ; then
+		if [ "$i" == ".:" ] ; then
+			continue
+		else
+			dir=`echo ${i:2} | sed 's/.$//'`
+			continue
+		fi
+	fi
+	if [ -z "$dir" ] ; then
+		s=`expr $s + \`ls -l $i | awk '{ print $5 }'\` 2>/dev/null `
+	else
+		s=`expr $s + \`ls -l $dir/$i | awk '{ print $5 }'\` 2>/dev/null `
+	fi
+done
+echo $s

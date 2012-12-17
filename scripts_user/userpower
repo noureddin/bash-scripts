@@ -9,7 +9,7 @@ usage() {
   or Hibernate the Computer, and more, without being root
   or using difficult GUI.
    Usage:
-  $0 logout|lockscreen|shutdown|restart|suspend|hibernate [minutes]
+  $0 logout|lockscreen|switchuser|shutdown|restart|suspend|hibernate [minutes]
 "
     exit
 }
@@ -25,11 +25,22 @@ THINGY_CONSOLEKIT="dbus-send --system --print-reply --dest=org.freedesktop.Conso
 case $1 in
 logout)
 	echo Going to $1 now ...
-    killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
+#    killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
+    killall -u $USER >/dev/null # This is better :P
 ;;
 lockscreen)
 	echo Going to $1 now ...
     for i in `ls /usr/bin/*screensaver`; do if [ ! -z `pidof $i` ] ; then ${i}-command -l ; fi ;done >/dev/null
+;;
+switchuser)
+	echo Going to $1 now ...
+    for i in `ls /usr/sbin/*dm`; do if [ ! -z "`pidof $i`" ] ; then case $i in
+    /usr/sbin/lightdm)dm-tool switch-to-greeter;;
+    /usr/sbin/mdm)mdmflexiserver;;
+    /usr/sbin/gdm)gdmflexiserver;; # Not tested yet
+    *)echo "Sorry, Your Display Manager is not supported yet.";;
+    esac
+    fi ;done
 ;;
 shutdown)
 	echo Going to $1 now ...
@@ -46,16 +57,6 @@ suspend)
 hibernate)
         echo Going to $1 now ...
     $THINGY_UPOWER org.freedesktop.UPower.Hibernate >/dev/null
-;;
-switchuser)
-	echo Going to $1 now ...
-    for i in `ls /usr/sbin/*dm`; do if [ ! -z "`pidof $i`" ] ; then case $i in
-    /usr/sbin/lightdm)dm-tool switch-to-greeter;;
-    /usr/sbin/mdm)mdmflexiserver;;
-    /usr/sbin/gdm)gdmflexiserver;; # Not tested yet
-    *)echo "Sorry, Your Display Manager is not supported yet.";;
-    esac
-    fi ;done
 ;;
 *)
     usage
