@@ -1,6 +1,6 @@
 #!/bin/bash
 # get size of a directory
-
+#Not working well :(
 if [ -z "$@" ] ; then
 	cd . #to avoid problems ;)
 else
