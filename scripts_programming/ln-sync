@@ -1,0 +1,44 @@
+#!/bin/bash
+#scriptname src_dir dest_dir
+
+function echofile {
+	if [ ! -d "$@" ] ; then
+		echo $@
+	fi
+}
+
+function ls-R {
+	cd $1
+	ls -R | while read i
+	do
+		if [ "${i:0:2}" == "./" ] ; then
+			dir=`echo ${i:2} | sed 's/.$//'`
+			continue
+		elif [ "$i" == ".:" ] ; then
+			continue
+		fi
+
+		if [ -z "$dir" ] ; then
+			echofile $i
+		else
+			echofile $dir/$i
+		fi
+	done
+}
+
+a=`ls-R $1`
+b=`ls-R $2`
+
+for i in $a
+do
+	if [ ! -e $2/$i ] ; then
+		dir=`echo $2/$i | sed 's/\/[^\/]\+$//'`
+		if [ -d "$dir" ] ; then
+			cd $dir
+		else
+			mkdir $dir
+			cd $dir
+		fi
+		ln -s $1/$i
+	fi
+done
