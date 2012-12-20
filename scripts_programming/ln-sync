@@ -12,7 +12,6 @@ function ls-R {
             continue
         fi
 
-
         if [ -z "$dir" ] ; then
             if [ ! -d "$i" ] ; then
 		echo $i ; fi
@@ -22,9 +21,6 @@ function ls-R {
         fi
     done
 }
-
-
-a=$(ls-R $1)
 
 ls-R $1 | while read i
 do

@@ -8,32 +8,13 @@
 #   ls-R . -A
 # Note: Directories aren't printed.
 
+# You may use 'find $dir' to do similar mission ;)
+
 if [ -z "$1" ] ; then
 	cd . #to avoid problems ;)
 else
 	cd $1
 fi
-
-# ls ${@:1} -R | grep ^..*:$ |
-# sed 's/^.\///' | sed 's/:$//' |
-# while read dir
-# do
-# 	cd "$dir"
-# 	ls ${@:1} |
-# 	while read file
-# 	do
-# 		if [ ! -d "$file" ]
-# 		then
-# 			echo $dir/$file
-# 		fi
-# 	done
-# done
-function echofile {
-#	if [ -e "$@" ] && [ ! -d "$@" ] ; then
-	if [ ! -d "$@" ] ; then
-		echo $@
-	fi
-}
 
 ls ${@:2} -R | while read i
 do
@@ -45,8 +26,10 @@ do
 	fi
 
 	if [ -z "$dir" ] ; then
-		echofile $i
+		if [ ! -d "$i" ] ; then
+			echo "$i" ; fi
 	else
-		echofile $dir/$i
+		if [ ! -d "$dir/$i" ] ; then
+			echo "$dir/$i" ; fi
 	fi
 done
