@@ -15,9 +15,22 @@ usage() {
 }
 
 if [ -z $# ] ; then
-    usage
-elif [ ! -z "$2" ] ; then
-    sleep ${2}m
+	usage
+elif [ -n "${@:2}" ] ; then
+	case "${@:2}" in
+	*"h"*|*"m"*|*"s"*) # 1h 5m 2s (if h, m or s found)
+		sleep ${@:2} 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+	*":"*) # 15:00 (if ':' found)
+		h=$((`echo ${@:2} | sed 's/:.*//'` - `date +%H`))
+		if [ $h -le 0 ] ; then
+			h=$(( $h + 24 )) ; fi
+		m=$((`echo ${@:2} | sed 's/.*://'` - `date +%M`))
+		if [ $m -lt 0 ] ; then
+			m=$(( $m + 60 )) ; fi
+		sleep ${h}h ${m}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+	*[0-9]*) # 5 (if contain numbers)
+		sleep ${@:2}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+	esac
 fi
 
 THINGY_UPOWER="dbus-send --system --print-reply --dest=org.freedesktop.UPower /org/freedesktop/UPower"

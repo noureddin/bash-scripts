@@ -84,7 +84,7 @@ function permconv { #when you use chmod you can't use the '-rwxr-xr-x' form dire
 function list {
 	if [ "$1" == "compact" ] #to list blocked apps only (doesn't print: 'No Applications/Commands were blocked', to facilitate using it in an application
 	then
-		echo `sed 's/.* //' $blst|sed 's/\/.*\///'`
+		echo `sed 's/.* //' $blst|sed 's/\/.*\///'` # sed 's/.* // ; s/\/.*\///' $blst
 	elif [ "$1" == "allow" ]
 	then
 		all=`	for i in $path
