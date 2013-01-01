@@ -39,21 +39,24 @@ case $1 in
 logout)
 	echo Going to $1 now ...
 #    killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
-    killall -u $USER >/dev/null # This is better :P
+    (gnome-session-save --kill --silent || mate-session-save --kill --silent) && killall -u $USER >/dev/null # This is better :P
+#   Problems might happen when use 'killall -u' with gnome or mate
 ;;
 lockscreen)
 	echo Going to $1 now ...
-    for i in `ls /usr/bin/*screensaver`; do if [ ! -z `pidof $i` ] ; then ${i}-command -l ; fi ;done >/dev/null
+    for i in `ls /usr/bin/*screensaver`; do if [ -n `pidof $i` ] && [ -e "${i}-command" ] ; then ${i}-command -l ; fi ; done >/dev/null
 ;;
 switchuser)
 	echo Going to $1 now ...
-    for i in `ls /usr/sbin/*dm`; do if [ ! -z "`pidof $i`" ] ; then case $i in
-    /usr/sbin/lightdm)dm-tool switch-to-greeter;;
-    /usr/sbin/mdm)mdmflexiserver;;
-    /usr/sbin/gdm)gdmflexiserver;; # Not tested yet
-    *)echo "Sorry, Your Display Manager is not supported yet.";;
-    esac
-    fi ;done
+#     for i in `ls /usr/sbin/*dm`; do if [ -n "`pidof $i`" ] ; then case $i in
+#     /usr/sbin/lightdm)dm-tool switch-to-greeter;;
+#     /usr/sbin/mdm)mdmflexiserver;;
+#     /usr/sbin/gdm)gdmflexiserver;; # Not tested yet
+#     *)echo "Sorry, Your Display Manager is not supported yet.";;
+#     esac
+#     fi ;done
+    dm-tool switch-to-greeter 2>/dev/null || mdmflexiserver 2>/dev/null || gdmflexiserver 2>/dev/null
+    # Simplicity is Good ;)
 ;;
 shutdown)
 	echo Going to $1 now ...
