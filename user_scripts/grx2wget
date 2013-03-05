@@ -16,7 +16,7 @@ cat /tmp/tempfile.grx | while read line
 do
     case "$line" in
     'URL:'*)
-        echo -n "wget ${line:5} -O " >> /tmp/tempwgetfile
+        echo -n "wget -c ${line:5} -O " >> /tmp/tempwgetfile
     ;;
     'File:'*)
         echo "\"${line:6}\"" | sed 's|\\|/|g' | sed "s|[a-Z]:|$HOME|g"  >> /tmp/tempwgetfile
