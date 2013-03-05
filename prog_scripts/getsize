@@ -1,0 +1,14 @@
+#!/bin/bash
+# get size of a directory
+
+if [ -z "$@" ] ; then
+	cd . # to avoid problems ;)
+else
+	cd $@
+fi
+s=0
+find ! -type d | while read i
+do
+	s=`expr $s + \`ls -l $i | awk '{ print $5 }'\` 2>/dev/null `
+done
+echo $s

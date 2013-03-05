@@ -1,0 +1,53 @@
+#!/bin/bash
+# Converting .grx files (getright list file) to a wget script ;)
+# Usage: grx2wget /path/to/file.grx
+# How to work:
+#  make a temp file to work on
+#  read every line in the original grx file
+#  if the line begin with "URL:" make it "wget $URL -O "
+#  and if it begins with "File:" continue the last line with it
+#  but make C:, D:, .. to /home/user and change every \ to /
+#  remove temp file
+#  make directories
+
+sed 's|\\|\\\\|g' "$@" > /tmp/tempfile.grx
+
+cat /tmp/tempfile.grx | while read line
+do
+    case "$line" in
+    'URL:'*)
+        echo -n "wget ${line:5} -O " >> /tmp/tempwgetfile
+    ;;
+    'File:'*)
+        echo "\"${line:6}\"" | sed 's|\\|/|g' | sed "s|[a-Z]:|$HOME|g"  >> /tmp/tempwgetfile
+    ;;
+    esac
+done
+
+# Make directories
+sed 's/.*"\([^"]\+\)".*/\1/' /tmp/tempwgetfile | # get the adressess only
+sed 's/\/[^\/]\+$//' |				 # remove the file name to keep the directories only
+uniq |						 # remove duplicated
+grep -v '#!' |					 # remove the '#!/bin/sh' line
+while read path
+do
+    until [ -z "$path" ]
+    do
+        echo $path
+        path=`echo $path | sed 's/\/[^\/]\+$//'`
+    done | tac >> /tmp/dirlist
+done
+
+echo '#!/bin/sh' > "${@}.sh"	# put the shebang line
+echo >> "${@}.sh"		# put an empty line
+cat /tmp/dirlist | uniq | while read path
+do echo "mkdir \"$path\" >/dev/null" >> "${@}.sh"
+done				# put the 'mkdir' lines
+
+echo >> "${@}.sh"		# put an empty line
+
+cat /tmp/tempwgetfile >> "${@}.sh" # put the 'wget $URL' lines
+
+rm /tmp/tempwgetfile
+rm /tmp/tempfile.grx
+rm /tmp/dirlist

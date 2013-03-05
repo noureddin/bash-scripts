@@ -8,19 +8,19 @@ function echohelp {
  Kernel Module Blocker for Unix-like systems (Still Under Testing)
   You can use this script to block any kernel module.
   Usage:
-	-b [mod] #to block any module
-	-a [mod] #to allow any blocked module
-	-l       #to list all "Modules on System" and "Blocked Modules"
-	-lc      #like previous but compact
-	-lb      #to list only blocked modules
+	-b [mod]  #to block any module
+	-a [mod]  #to allow any blocked module
+	-l        #to list all "Modules on System" and "Blocked Modules"
+	-lc       #like previous but compact
+	-lb       #to list only blocked modules
 	-lbc      #like previous but compact
-	-la      #to list only non-blocked modules
+	-la       #to list only non-blocked modules
 	-lac      #like previous but compact
-	-u       #use it when you finish to probe all modules and update your initrd
-	-i       #to install this application to your system
-	-aa      #to empty the blacklist and allow all blocked modules
+	-u        #use it when you finish to probe all modules and update your initrd
+	-i        #to install this application to your system
+	-aa       #to empty the blacklist and allow all blocked modules
 	any thing else:
-	         #to show this help ;)
+	          #to show this help ;)
 '
 		hb=1
 	fi
@@ -155,7 +155,7 @@ do
 		then
 			echo "$a is not blocked"
 		else
-			sed "/$a/d" $blst > ${blst}.save #remove it from blacklist
+			sed "|$a|d" $blst > ${blst}.save #remove it from blacklist
 			mv ${blst}.save ${blst}
 			echo "allowed $a"
 		fi

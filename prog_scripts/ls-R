@@ -9,6 +9,7 @@
 # Note: Directories aren't printed.
 
 # You may use 'find $dir' to do similar mission ;)
+# You may use 'find ! -type d' to do almost the same thing that this script does
 
 if [ -z "$1" ] ; then
 	cd . #to avoid problems ;)

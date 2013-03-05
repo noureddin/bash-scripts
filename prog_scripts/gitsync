@@ -9,13 +9,13 @@ then
    A simple and small script to sync your remote git repo with your local one
    Just edit local repo and get remote one synchronized
 Installation
-  sudo cp gs /usr/bin
+  sudo cp $0 /usr/bin
 Usage
-  Form: gs [local_repo] [commit_msg]
-  *Note: You should have already installed 'git' and git repo
-  If you are already in your local repo, just execute 'gs' or 'gs .' and
+  Form: $0 [local_repo] [commit_msg]
+  *Note: You should have already installed 'git' and have a git repo
+  If you are already in your local repo, just execute '$0' or '$0 .' and
    wait to calculate files and enter your username and password.
-  If you are in another directory and want to sync your git, just execute 'gs'
+  If you are in another directory and want to sync your git, just execute '$0'
    followed by your local git directory.
   You can use specified commit message instead of 'Updated' followed by the date.
   NOTE: 'local_repo' and 'commit_msg' must be included in \" and \" if contain spaces

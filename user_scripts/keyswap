@@ -1,8 +1,8 @@
 #!/bin/bash
 # a shell script to generate a setxkbmap line and make it "autostart"
-#If you found any bugs or have any suggestions:
-#Contact me at : noureddin95 at gmail dot com
-#the path '~/' returns error, so replaced by '$HOME/'
+# If you found any bugs or have any suggestions:
+# Contact me at : noureddin95 at gmail dot com
+
 if [ -z "$1" ] || [ "$1" == "-h" ]
 then
 	echo "
@@ -11,15 +11,15 @@ then
     ./keyswap layout1,layout2,..,layoutN switch_keys indicator_led
     example:
     ./keyswap us,ru,ara alt_shift scroll
-     To use \"us\" and \"ru\" and \"ara\" layouts, and switch between them (toggle) using \"alt\"
+     To use \"us\" and \"ru\" and \"ara\" layouts, and switch between (toggle) them using \"alt\"
      and \"shift\", and turn on \"scroll\" led when the current layout is NOT the first.
     Note:
      If you didn't choose switch_keys or indicator_led, It\'d be \"alt_shift\" and \"scroll\"
 "
 	exit
-elif [ "$1" == "-a" ] #not mentioned in help because it need some improvements ;)
+elif [ "$1" == "-a" ] # not mentioned in help because it need some improvements ;)
 then
-	cat /usr/X11R6/share/X11/xkb/rules/base.lst
+	cat /usr/share/X11/xkb/rules/base.lst
 fi
 kym="setxkbmap -layout \"$1\" -option \"grp:"
 if [ -z $2 ]
@@ -49,4 +49,5 @@ Exec=${kym}
 StartupNotify=false
 Terminal=false
 Hidden=false" > "$HOME/.config/autostart/keyswap.desktop"
+
 exit

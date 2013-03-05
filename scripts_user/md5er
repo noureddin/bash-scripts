@@ -1,4 +1,0 @@
-#!/bin/bash
-#if you want to md5sum a string and you don't want to make it visible in .bash_history file
-read a
-echo $a | md5sum | sed 's/ .*//'

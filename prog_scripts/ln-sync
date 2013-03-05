@@ -1,5 +1,5 @@
 #!/bin/bash
-#scriptname src_dir dest_dir
+# scriptname src_dir dest_dir
 
 function ls-R {
     cd $1

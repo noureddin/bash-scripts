@@ -1,0 +1,80 @@
+#!/bin/bash
+# mount all unmounted mountable partitions like udisks but with 'root' account and mount as /media/drive or /C and /D :)
+# RECOMMENDATION: Use 'mountall' which exists in the same directory :)
+# The following script needs some correction in the part of excluding filesystem partitons.
+# TODO: mount m,c,mc all to for and $i
+
+if [ "$1" != "m" ] && [ "$1" != "c" ] && [ "$1" != "mc" ]
+then
+	echo '''
+  This script mounts all unmounted mountable partitions like "udisks --mount",
+ but it works only with root. It can mount your partitions as usual,
+ and it also can mount yours at /C, /D and /E :)
+    USAGE:
+      ./mount m  # to mount under /media as usual.
+      ./mount c  # to mount as /C, /D , etc.
+      ./mount mc # to mount using both ways.
+'''
+else
+	all=$(ls /dev/sd*)
+	fs=(`cat /etc/mtab | grep '^/' | sed 's/[ ].*//'`)
+	for i in ${fs[@]}
+	do
+		if [ "${i:0:9}" == "/dev/disk" ]
+		then
+			mfs=`echo $mfs /dev/\`ls -l $i|sed 's/.*[ ../../]//'\``
+		else
+			mfs=`echo $mfs $i`
+		fi
+	done
+	
+	for i in ${all[@]}
+	do
+		case "${mfs[@]}" in *"$i"*) ;; *)
+ 			type=`blkid $i | sed 's/.*TYPE="\([^"]\+\)".*/\1/'`
+			if [ -n "$type" ] && [ "$type" != "swap" ]
+			then
+				partition="${partition} ${i}"
+			fi
+
+		;; esac
+	done
+	# all that to avoid disks, extended and mounted partitions, we want only unmounted mountable partitions
+	
+	partition=($partition)
+	if [ "$1" == "m" ] || [ "$1" == "mc" ]
+	then
+		for ((i=0;i<${#partition[@]};i++))
+		do
+			mnt=`blkid ${partition[$i]} | sed 's/.*LABEL="\([^"]\+\)".*/\1/'`
+			if [ "${mnt:0:1}" == "/" ]
+			then
+				mnt=`blkid ${partition[$i]} | sed 's/.*UUID="\([^"]\+\)".*/\1/'`
+			fi
+			
+			mkdir /media/$mnt &>/dev/null
+			type=`blkid ${partition[$i]} | sed 's/.*TYPE="\([^"]\+\)".*/\1/'`
+			if [ "$type" == "vfat" ] || [ "$type" == "ntfs" ] || [ "$type" == "ntfs-3g" ]
+			then
+				mount ${partition[$i]} /media/$mnt -o umask=0 &>/dev/null
+			else
+				mount ${partition[$i]} /media/$mnt &>/dev/null
+			fi
+		done
+	fi
+	if [ "$1" == "c" ] || [ "$1" == "mc" ]
+	then
+		char=({C..Z})
+		for ((i=0;i<${#partition[@]};i++))
+		do
+			mkdir /${char[$i]} &>/dev/null
+			type=`blkid ${partition[$i]} | sed 's/.*TYPE="\([^"]\+\)".*/\1/'`
+			if [ "$type" == "vfat" ] || [ "$type" == "ntfs" ] || [ "$type" == "ntfs-3g" ]
+			then
+				mount ${partition[$i]} /${char[$i]} -o umask=0 &>/dev/null
+			else
+				mount ${partition[$i]} /${char[$i]} &>/dev/null
+			fi
+		done
+	fi
+fi

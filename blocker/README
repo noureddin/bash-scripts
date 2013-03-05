@@ -1,5 +1,7 @@
 README for Blocker
 
+NOTE: New Edition, Still under Develepement
+
  Application Blocker for Unix-like systems
   You can use this script to block any application.
   It -Simply- chmod 000 the application you want.
@@ -17,11 +19,13 @@ Usage:
          sudo blocker -a app1 app2 .. appN
          Mixed Input:
 	  sudo blocker -b app1 app2 .. appN -a app1 app2 .. appN
-	  #You can block and allow any number of application in one line
-	  sudo blocker -b app1 app2 -a app3 -b app4 -b app5 #Valid
+	  # You can block and allow any number of application in one line
+	  sudo blocker -b app1 app2 -a app3 -b app4 -b app5 # Valid
 	List:
-	 sudo blocker -l  #to list all
-	 sudo blocker -ll #to list all but one per line
+	sudo blocker -l   # to list all blocked applications
+	sudo blocker -lc  # like previous but `compact` not `per line`
+	sudo blocker -la  # to list all non-blocked applications
+	sudo blocker -lac # like previous but `compact` not `per line`
 	Allow All Blocked Applications:
 	 sudo blocker -aa
 	Help:

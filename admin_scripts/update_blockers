@@ -1,4 +1,4 @@
 #!/bin/bash
-#update blocker and modblock, run with root
+# update blocker and modblock, run with root
 wget https://raw.github.com/noureddin/bash-scripts/master/modblock/modblock -O /usr/sbin/modblock &>/dev/null
 wget https://raw.github.com/noureddin/bash-scripts/master/blocker/blocker -O /usr/sbin/blocker &>/dev/null

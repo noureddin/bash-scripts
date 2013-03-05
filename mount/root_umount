@@ -1,7 +1,0 @@
-#!/bin/bash
-#Not recommended for use
-#this unmounts all partitions
-umount -a &>/dev/null
-rmdir /media/* &>/dev/null
-mkdir /media/cdrom &>/dev/null
-rmdir /{C..Z} &>/dev/null

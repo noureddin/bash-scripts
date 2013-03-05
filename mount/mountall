@@ -1,7 +1,7 @@
 #!/bin/bash
-#add this script to /etc/rc.local before "exit 0" line, to mount all partitions while booting
-#add '/mountall' to rc.local, do NOT add the code itself.
-#This can run by normal user, but some distros need root acces to mount any thing :)
+# add this script to /etc/rc.local before "exit 0" line, to mount all partitions while booting
+# add '/mountall' to rc.local, do NOT add the code itself.
+# This can run by normal user, but some distros need root acces to mount any thing :)
 
 a=$(ls /dev/sd*)
 for i in $a

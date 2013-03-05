@@ -1,9 +1,13 @@
-#!/bin/bash
-#Install by "sudo cp blocker /usr/sbin;sudo touch /etc/blocker" or "sudo ./blocker -i"
+# !/bin/bash
+# Install by "sudo ./blocker -i" or "sudo cp blocker /usr/sbin"
+# why you need to type sudo bash blocker insteed of sudo ./blocker
+# List, Improve it
+# requires coreutils
+# which -> type -a - if shell built-in don't block
+# list -> if not x don't list
 
-hb=0 #helpboolean, to avoid printing help more than one time
 function echohelp {
-	if [ $hb -eq 0 ]
+	if [ "$hb" != "1" ] # helpboolean, to avoid printing help more than one time
 	then
 		echo '
  Application Blocker for Unix-like systems
@@ -11,16 +15,16 @@ function echohelp {
   It -Simply- does chmod 000 to the application you want
   to block, and returns its permissions when you "allow" it.
   Usage:
-	-b [app] #to block any application
-	-a [app] #to allow any blocked application
-	-aa      #to allow ALL blocked application
-	-l       #to list all blocked applications
-	-lc      #like previous but `compact` not `per line`
-	-la      #to list all non-blocked applications
-	-lac     #like previous but `compact` not `per line`
-	-i       #to install this application to your system
+	-b [app]   # to block any application
+	-a [app]   # to allow any blocked application
+	-aa        # to allow ALL blocked application
+	-l         # to list all blocked applications
+	-lc        # like previous but `compact` not `per line`
+	-la        # to list all non-blocked applications
+	-lac       # like previous but `compact` not `per line`
+	-i         # to install this application to your system
 	any thing else
-	         #to show this help ;)
+	           # to show this help ;)
 '
 		hb=1
 	fi
@@ -32,70 +36,76 @@ then
 	exit
 fi
 
-blst="/etc/blocker" #blacklist file
-touch $blst #to stop errors if not found ;)
-chmod 0777 $blst #to allow it to use (we chmod 0000 it before end
-#to prevent others from reading what we had blocked ;) )
-path=`echo $PATH|sed 's/:/ /g'` #replace ":" by space to make $PATH an array
-#(for bash, arrays can be strings separated by spaces, like "hi i am an human")
-#and the 'g' at the end of 'sed' is to replace all
+blst="/etc/blocker.blst"  # blacklist file
+touch $blst  # to stop errors if not found ;)
+chmod 0777 $blst  # to allow it to use (we chmod 0000 it before end
+# to prevent others from reading what we had blocked ;) )
 
-function permconv { #when you use chmod you can't use the '-rwxr-xr-x' form directly,
-#so this function converts it to the numerical form: '0755'
-	permconv=0
-	if [ ${1:1:1} == "r" ];then #-r--------
-		permconv=`expr $permconv + 400`;fi
-	if [ ${1:2:1} == "w" ];then #--w--------
-		permconv=`expr $permconv + 200`;fi
-	if [ ${1:3:1} == "x" ];then #---x------
-		permconv=`expr $permconv + 100`
-	elif [ ${1:3:1} == "s" ];then #---s------
-		permconv=`expr $permconv + 4000`
-	elif [ ${1:3:1} == "S" ];then #---S------
-		permconv=`expr $permconv + 4100`;fi
-	if [ ${1:4:1} == "r" ];then #----r-----
-		permconv=`expr $permconv + 40`;fi
-	if [ ${1:5:1} == "w" ];then #-----w----
-		permconv=`expr $permconv + 20`;fi
-	if [ ${1:6:1} == "x" ];then #------x---
-		permconv=`expr $permconv + 10`
-	elif [ ${1:6:1} == "s" ];then #------S---
-		permconv=`expr $permconv + 2000`
-	elif [ ${1:6:1} == "S" ];then #------S---
-		permconv=`expr $permconv + 2010`;fi
-	if [ ${1:7:1} == "r" ];then #-------r--
-		permconv=`expr $permconv + 4`;fi
-	if [ ${1:8:1} == "w" ];then #--------w-
-		permconv=`expr $permconv + 2`;fi
-	if [ ${1:9:1} == "x" ];then #---------x
-		permconv=`expr $permconv + 1`
-	elif [ ${1:9:1} == "t" ];then #---------t
-		permconv=`expr $permconv + 1000`
-	elif [ ${1:9:1} == "T" ];then #---------T
-		permconv=`expr $permconv + 1001`;fi
-	if [ ${#permconv} -lt 4 ] #to change 755 to 0755 and 50 to 0050 and 0 to 0000
-	then
-		permcount=`expr 4 - ${#permconv}`
-		permconv=`printf "0%.0s" $(seq $permcount)`$permconv
-	fi
-	echo $permconv
-}
+# GoodBye `premconv`, Hello `stat` - "used as `stat -c %a file`"
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# function permconv {  # when you use chmod, you can't use the '-rwxr-xr-x' form directly,
+# # so this function converts it to the numerical form: '0755'
+# # 'Symbolic notation' to 'Numeric notation' or 'Octal-Mode'
+# 	permconv=0
+# 	if [ ${1:1:1} == "r" ];then  # -r--------
+# 		permconv=`expr $permconv + 400`;fi
+# 	if [ ${1:2:1} == "w" ];then  # --w--------
+# 		permconv=`expr $permconv + 200`;fi
+# 	if [ ${1:3:1} == "x" ];then  # ---x------
+# 		permconv=`expr $permconv + 100`
+# 	elif [ ${1:3:1} == "S" ];then  # ---S------
+# 		permconv=`expr $permconv + 4000`
+# 	elif [ ${1:3:1} == "s" ];then  # ---s------
+# 		permconv=`expr $permconv + 4100`;fi
+# 	if [ ${1:4:1} == "r" ];then  # ----r-----
+# 		permconv=`expr $permconv + 40`;fi
+# 	if [ ${1:5:1} == "w" ];then  # -----w----
+# 		permconv=`expr $permconv + 20`;fi
+# 	if [ ${1:6:1} == "x" ];then  # ------x---
+# 		permconv=`expr $permconv + 10`
+# 	elif [ ${1:6:1} == "S" ];then  # ------S---
+# 		permconv=`expr $permconv + 2000`
+# 	elif [ ${1:6:1} == "s" ];then  # ------s---
+# 		permconv=`expr $permconv + 2010`;fi
+# 	if [ ${1:7:1} == "r" ];then  # -------r--
+# 		permconv=`expr $permconv + 4`;fi
+# 	if [ ${1:8:1} == "w" ];then  # --------w-
+# 		permconv=`expr $permconv + 2`;fi
+# 	if [ ${1:9:1} == "x" ];then  # ---------x
+# 		permconv=`expr $permconv + 1`
+# 	elif [ ${1:9:1} == "T" ];then  # ---------T
+# 		permconv=`expr $permconv + 1000`
+# 	elif [ ${1:9:1} == "t" ];then  # ---------t
+# 		permconv=`expr $permconv + 1001`;fi
+# 	if [ ${#permconv} -lt 4 ]  # to change 755 to 0755 and 50 to 0050 and 0 to 0000
+# 	then
+# 		permcount=`expr 4 - ${#permconv}`
+# 		permconv=`printf "0%.0s" $(seq $permcount)`$permconv
+# 	fi
+# 	echo $permconv
+# }
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 function list {
-	if [ "$1" == "compact" ] #to list blocked apps only (doesn't print: 'No Applications/Commands were blocked', to facilitate using it in an application
+	if [ "$1" == "compact" ]  # to list blocked apps only (doesn't print: 'No Applications/Commands were blocked', to facilitate using it in an application
 	then
-		echo `sed 's/.* //' $blst|sed 's/\/.*\///'` # sed 's/.* // ; s/\/.*\///' $blst
+		echo `sed 's/.* //' $blst|sed 's/\/.*\///'`  #  sed 's/.* // ; s/\/.*\///' $blst
 	elif [ "$1" == "allow" ]
 	then
-		all=`	for i in $path
+		all=`	path=\`echo $PATH|sed 's/:/ /g'\`
+			for i in $path
 			do
 				ls $i 2>/dev/null
 			done|sed 's/\ /\n/g'|sort|uniq`
+			# about '$path':
+			# replace ":" by space to make $PATH an array
+			# (for bash, arrays can be strings separated by spaces, like "hi i am an human")
+			# and the 'g' at the end of 'sed' is to replace all
 			# 2>/dev/null to print results only not errors
-		if [ -s $blst ] #check if list not empty
+		if [ -s $blst ]  # check if list not empty
 		then
 			all=`echo $all|grep -v "\`grep -v '^$' $blst|sed 's/.* //'\`"`
-			#to remove blocked apps from the list, to print only the non-blocked apps
+			# to remove blocked apps from the list, to print only the non-blocked apps
 		else
 			if [ "$2" == "compact" ]
 			then
@@ -104,120 +114,129 @@ function list {
 				echo $all|sed 's/\ /\n/g'
 			fi
 		fi
-	else #to list blocked apps but 'per line'
+	else  # to list blocked apps but 'per line'
 		sed 's/.* //' $blst|sed 's/\/.*\///'
 	fi
 }
 
 for a in $@
 do
-	if [ "$a" == "-b" ] #block
-	then
+	case $a in
+	"-b")  # block
 		case="block"
 		continue
-	elif [ "$a" == "-a" ] #allow
-	then
+	;;
+	"-a")  # allow
 		case="allow"
 		continue
-	elif [ "$a" == "-aa" ] #allow all
-	then
-		grep -v '^$' $blst | #we don't want empty lines :P
-		while read i #read each line in blacklist
+	;;
+	"-aa")  # allow all
+		grep -v '^$' $blst |  # we don't want empty lines :P
+		while read i  # read each line in blacklist
 		do
-			chmod $i #because it's stored 'perm /path' to facilitate re-chmod it
+			chmod $i  # because it's stored 'perm /path' to facilitate re-chmod it
 			echo Allowed all blocked application
 		done
-		echo -n >"$blst" #to empty the blacklist and '-n' is to avoid printing newline
+		echo -n >"$blst"  # to empty the blacklist and '-n' is to avoid printing newline
 		continue
-	elif [ "$a" == "-l" ] #list all blocked apps - per line
-	then
+	;;
+	"-l")  # list all blocked apps - per line
 		list
 		continue
-	elif [ "$a" == "-lc" ] #list all blocked app - compact
-	then
+	;;
+	"-lc")  # list all blocked app - compact
 		list compact
 		continue
-	elif [ "$a" == "-la" ] #list all non-blocked apps - per line
-	then
+	;;
+	"-la")  # list all non-blocked apps - per line
 		list allow
 		continue
-	elif [ "$a" == "-lac" ] #list all blocked apps - compact
-	then
+	;;
+	"-lac")  # list all blocked apps - compact
 		list allow compact
 		continue
-	elif [ "$a" == "-i" ] #install
-	then
-		cp $0 /usr/sbin #used $0 not 'blocker' to install/copy it whatever
-		#its name was. and copied to /usr/sbin to be used only by root
+	;;
+	"-i")  # install
+		cp $0 /usr/sbin  # used $0 not 'blocker' to install/copy it whatever
+		# its name was. and copied to /usr/sbin to be used only by root
 		echo "Blocker Installed"
 		continue
-	elif [ "${a:0:1}" == "-" ] #if first letter is dash, to avoid any non-understood options
-	then
+	;;
+	"-"*)  # if first letter is dash, to avoid any non-understood options
 		echohelp
 		continue
-	fi
+	;;
+	esac
 
-	if [ "$case" != "block" ] && [ "$case" != "allow" ] #if entered appname without typing -b or -a before
+	if [ "$case" != "block" ] && [ "$case" != "allow" ]  # if entered appname without typing -b or -a before
 	then
 		echohelp
-		continue
-	fi
-
-	found=""
-	for dir in $path
-	do
-		if [ -e "${dir}/${a}" ] #if app found in this dir
-		then
-			if [ -L "${dir}/${a}" ] #if app is just a link
-			then
-				link=`ls -l ${dir}/${a}|sed "s/.* //"` #get the path of original app
-				if [ ${link:0:1} != '/' ];then #if it's NOT full path
-					link="${dir}/${link}";fi #make it full path
-				if [ -e "$link" ];then #if it exists, to avoid any errors
-					found="$found $link";fi
-			else
-				found="$found $dir/$a"
-			fi
-		fi
-	done
-	if [ -z "$found" ]
-	then
-		echo "$a not found"
 		continue
 	fi
 
 	if [ "$case" == "block" ]
 	then
-		for file in $found #if found in many directories
-		do
-			mod=`permconv \`ls -l ${file}|sed "s/ .*//"\`` #get the current file permissions
-			if [ "$mod" == "0000" ]
+		# Finding the app
+		if app=`which $a` # if the $a found in $PATH
+		then
+			link=''
+			if [ -L "${app}" ]  # if the app is just a link
 			then
-				echo "${file} is already blocked or have not any permissions"
-			else
-				killall -q `echo ${file}|sed 's/.*\///'` #to kill the appname not the fullpath
-				echo "${mod} ${file}" >> "$blst" #add it to the blacklist
-				chmod 0000 $file #make the app unaccessible
-				echo blocked $file
+				link=`ls -l ${app} | sed "s/.* //"`  # get the path of the original app
+				case $link in
+				'/'*)
+					# if it's an absolute (full) path ; do nothing
+					;;
+				'./'*|'../'*)
+					# if it's a relative path ; make it absolute
+					link="`cd \`echo $link | sed 's/\/[^\/]\+$//'\` && pwd`/`echo $app | sed 's/.*\///'`"
+					;;
+				*)
+					# else - if it's a relative path to here
+					link="`echo $app | sed 's/\/[^\/]\+$//'`/${link}"  # make it absolute path
+					;;
+				esac
+				if [ -x "$link" ];then  # if it exists and executive, to avoid any errors
+					app="$link"
+				fi
 			fi
-		done
+		else
+			echo "$a not found or blocked"
+			continue
+		fi
+		# Blocking the app
+		mod=`permconv \`ls -l ${app} | sed "s/ .*//"\``  # get the current file permissions
+		if [ "$mod" == "0000" ]
+		then
+			echo "${app} is already blocked or have not any permissions"
+		else
+			killall -q $a  # to kill using the appname not the fullpath
+			if [ -z "$link" ] ; then  # check if this app was NOT a link
+				echo "$mod $app" >> "$blst"  # add it to the blacklist
+			else  # this app was a link
+				echo "$mod `which $a` $app" >> "$blst"  # add it with the link path to the blacklist
+				# we added the link path because when allowing, we only search in the blacklist
+				# and the user will allow the link name not the main app name
+			fi
+			chmod 0000 $app  # make the app inaccessible
+			echo "$a blocked"  # to print the name the user has entered not the full path
+		fi
 	elif [ "$case" == "allow" ]
 	then
-		for file in $found #if found in many directories
-		do
-			mod=`permconv \`ls -l ${file}|sed "s/ .*//"\`` #get the current file permissions
-			if [ "$mod" != "0000" ] || [ "`grep ${file} ${blst}`" == '' ]
-			then
-				echo "${file} is not blocked or not found in blocked list"
-			else
-				chmod `grep $file $blst` #it's sorted 'perm /path' to faciltate re-chomd it
-				echo allowed $file
-				file=${file//$'/'/$'\/'} #replace '/' with '\/' to avoid problems with 'sed'
-				sed "/$file/d" $blst > ${blst}.save #remove the app from blacklist
-				mv ${blst}.save ${blst} #we can't save to the same file, so we did this trick ;)
-			fi
-		done
+		# Finding the app
+		app=`grep -v $a[^\ ] $blst | grep /$a | tail -n 1`
+		if [ -z "$app" ]
+		then
+			echo "$a not blocked"
+			continue
+		fi
+		# Allowing the app
+		chmod $app  # it's stored as 'perm /path' to facilitate re-chmod it
+		# But links are stored as 'perm /link /path'
+		echo "$a allowed"
+		sed "|$app|d" $blst > ${blst}.save  # remove the app from blacklist
+		mv ${blst}.save ${blst}  # we can't save to the same file, so we did this trick ;)
 	fi
 done
-chmod 0000 $blst #to prevent others from reading what we had blocked ;)
+chmod 0000 $blst  # to prevent others from reading what we had blocked ;)
 exit

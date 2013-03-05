@@ -1,6 +1,7 @@
 #!/bin/bash
-# FROM:http://blog.anantshri.info/howto-add-ppa-in-debian/
-# Equal to ubuntu add-apt-repository but works in debian also
+# FROM: http://blog.anantshri.info/howto-add-ppa-in-debian/
+# Similar to ubuntu add-apt-repository but works in debian also
+# You may use add-apt-repository itself in debian from package python-software-properties
 
 if [ $# -eq 1 ]
 NM=`uname -a && date`
@@ -24,4 +25,4 @@ else
 	echo "Utility to add PPA repositories in your debian machine"
 	echo "$0 ppa:user/ppa-name"
 fi
-apt-get update
+apt-get update > /dev/null

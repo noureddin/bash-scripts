@@ -19,17 +19,21 @@ if [ -z $# ] ; then
 elif [ -n "${@:2}" ] ; then
 	case "${@:2}" in
 	*"h"*|*"m"*|*"s"*) # 1h 5m 2s (if h, m or s found)
-		sleep ${@:2} 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+		sleep ${@:2} 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 )
+		;;
 	*":"*) # 15:00 (if ':' found)
+		# TODO: needs some improvements ;)
 		h=$((`echo ${@:2} | sed 's/:.*//'` - `date +%H`))
 		if [ $h -le 0 ] ; then
 			h=$(( $h + 24 )) ; fi
 		m=$((`echo ${@:2} | sed 's/.*://'` - `date +%M`))
 		if [ $m -lt 0 ] ; then
 			m=$(( $m + 60 )) ; fi
-		sleep ${h}h ${m}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+		sleep ${h}h ${m}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 )
+		;;
 	*[0-9]*) # 5 (if contain numbers)
-		sleep ${@:2}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 ) ;;
+		sleep ${@:2}m 2>/dev/null || ( echo 'Timing Error' >&2 && exit 2 )
+		;;
 	esac
 fi
 
@@ -39,7 +43,7 @@ case $1 in
 logout)
 	echo Going to $1 now ...
 #    killall `w -f | grep tty | awk '{print $7 }'` >/dev/null
-    (gnome-session-save --kill --silent || mate-session-save --kill --silent) && killall -u $USER >/dev/null # This is better :P
+    gnome-session-save --kill --silent >/dev/null || mate-session-save --kill --silent >/dev/null ;  killall -u $USER >/dev/null # This is better :P
 #   Problems might happen when use 'killall -u' with gnome or mate
 ;;
 lockscreen)
@@ -56,6 +60,7 @@ switchuser)
 #     esac
 #     fi ;done
     dm-tool switch-to-greeter 2>/dev/null || mdmflexiserver 2>/dev/null || gdmflexiserver 2>/dev/null
+# MayBe: gdm-control
     # Simplicity is Good ;)
 ;;
 shutdown)
