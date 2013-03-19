@@ -1,7 +1,6 @@
 #!/bin/bash
 # mount all unmounted mountable partitions like udisks but with 'root' account and mount as /media/drive or /C and /D :)
 # RECOMMENDATION: Use 'mountall' which exists in the same directory :)
-# The following script needs some correction in the part of excluding filesystem partitons.
 # TODO: mount m,c,mc all to for and $i
 
 if [ "$1" != "m" ] && [ "$1" != "c" ] && [ "$1" != "mc" ]

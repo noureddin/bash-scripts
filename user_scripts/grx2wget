@@ -1,6 +1,7 @@
 #!/bin/bash
 # Converting .grx files (getright list file) to a wget script ;)
 # Usage: grx2wget /path/to/file.grx
+# Before Using: correct the file encoding (if non-latin) and line ending (to linux, "LF")
 # How to work:
 #  make a temp file to work on
 #  read every line in the original grx file
@@ -28,20 +29,13 @@ done
 sed 's/.*"\([^"]\+\)".*/\1/' /tmp/tempwgetfile | # get the adressess only
 sed 's/\/[^\/]\+$//' |				 # remove the file name to keep the directories only
 uniq |						 # remove duplicated
-grep -v '#!' |					 # remove the '#!/bin/sh' line
-while read path
-do
-    until [ -z "$path" ]
-    do
-        echo $path
-        path=`echo $path | sed 's/\/[^\/]\+$//'`
-    done | tac >> /tmp/dirlist
-done
+grep -v '#!' > /tmp/dirlist			 # remove the '#!/bin/sh' line and store it in a temp file
+
 
 echo '#!/bin/sh' > "${@}.sh"	# put the shebang line
 echo >> "${@}.sh"		# put an empty line
 cat /tmp/dirlist | uniq | while read path
-do echo "mkdir \"$path\" 2>/dev/null" >> "${@}.sh"
+do echo "mkdir -p \"$path\" 2>/dev/null" >> "${@}.sh"
 done				# put the 'mkdir' lines
 
 echo >> "${@}.sh"		# put an empty line

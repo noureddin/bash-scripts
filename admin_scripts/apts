@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# apts install package = apt-get install package
+# apts remove package = apt-get remove package
+# apts purge package = apt-get purge package
+# apts add repo = add-apt-repository repo
+# apts rem repo = add-apt-repository -r repo
+# apts rm oldkernels = special_script
+# apts purge removed = apt-get install package
+# apts edit = nano /etc/apt/sources.list
+# apts install package = apt-get install package
+
+case "$1" in
+"install"|"update"|"upgrade"|"dist-upgrade"|"download"|"remove"|"autoremove"|"purge"|"clean"|"autoclean")
+  apt-get $@
+;;
+"rm")
+  case "$2" in
+  "oldkernels")
+    # http://www.ubuntubuzz.com/2012/02/script-remove-unused-old-kernel.html
+    ls /boot/ | grep vmlinuz |
+    sed 's@vmlinuz-@linux-image-@g' |
+    grep -v `uname -r` |
+    while read kern ; do
+      apt-get remove $kern -y ; done
+  ;;
+  "orphan")
+    apt-get purge `deborphan` -y
+  ;;
+  "purge")  # https://ascending.wordpress.com/2007/04/10/apt-tip-purge-removed-packages/
+    dpkg -l | awk '/^rc/ {print $2}' | xargs sudo dpkg --purge
+  esac
+;;
+
+"edit")
+  nano /etc/apt/sources.list
+;;
+"show"|"search")
+  apt-cache $@
+;;
+"install")
+
+;;
+"install")
+
+;;
+"install")
+
+;;
+"install")
+
+;;
+"install")
+
+;;
+esac

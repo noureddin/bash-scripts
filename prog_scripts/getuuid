@@ -1,9 +1,9 @@
 # !/bin/bash
 # example: ./getuuid /dev/sda1 or even sudo ./getuuid sda1
 
-# We can use 'blkid' (which is 'root' command) as usual user to show partitions info
-/sbin/blkid | grep $1 | sed 's/.*UUID="\([^"]\+\)".*/\1/' # to allow using ./getuuid sda1
-# /sbin/blkid $1 | sed 's/.*UUID="\([^"]\+\)".*/\1/' # to force the user to use ./getuuid /dev/sda1
+# We can use 'blkid' (which is a root-only command) as usual user to show partitions info
+/sbin/blkid | grep $1 | sed 's/.*UUID="\([^"]\+\)".*/\1/' # to allow using the form ./getuuid sda1
+# /sbin/blkid $1 | sed 's/.*UUID="\([^"]\+\)".*/\1/' # to force the user to use the form ./getuuid /dev/sda1
 # You can replace UUID with TYPE or LABEL
 # If LABEL not found, It returns all the string which starts with '/dev/sd..'
 

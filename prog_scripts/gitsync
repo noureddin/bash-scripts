@@ -1,6 +1,6 @@
 #!/bin/bash
-#From: https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd
-#TODO: Support commit msg with spaces and without (")s
+# From: https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd
+# TODO: Support commit msg with spaces and without (")s
 
 if [ "$1" == "-h" ] || [ "$1" == "--help" ]
 then
@@ -20,7 +20,7 @@ Usage
   You can use specified commit message instead of 'Updated' followed by the date.
   NOTE: 'local_repo' and 'commit_msg' must be included in \" and \" if contain spaces
 
-Taken from https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd and modified by me :)
+Forked from https://culturedcode.com/things/wiki/index.php/Syncing_Things_with_git_and_Launchd
 "
 exit
 fi

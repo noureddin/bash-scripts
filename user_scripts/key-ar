@@ -1,0 +1,30 @@
+#!/bin/bash
+# a shell script to generate a setxkbmap line and make it "autostart"
+# based on https://github.com/noureddin/bash-scripts/blob/master/user_scripts/keyswap
+a=;
+a=`zenity --title="مبدّل المفاتيح" --entry --text="رجاءً أدخل أسماء خرائط المفاتيح مفصولة بـ (,).\nإذا لم تدخل شيئا ستكون us,ara"`
+
+if [ -n "$a" ] ; then
+  kym="setxkbmap -layout \"$a\" -option \"grp:alt_shift_toggle,grp_led:scroll\""
+else
+  kym="setxkbmap -layout \"us,ara\" -option \"grp:alt_shift_toggle,grp_led:scroll\""
+fi
+
+$kym
+
+mkdir $HOME/.config $HOME/.config/autostart &>/dev/null
+
+echo "[Desktop Entry]
+Encoding=UTF-8
+Version=0.9.4
+Type=Application
+Name=KeySwap
+Exec=${kym}
+StartupNotify=false
+Terminal=false
+Hidden=false" > "$HOME/.config/autostart/keyswap.desktop"
+
+zenity --title="مبدّل المفاتيح" --info --text="تمت المهمة بفضل الله.\nيمكنك استخدام زري Alt وShift للتبديل بين العربية والانجليزية."
+
+
+exit
