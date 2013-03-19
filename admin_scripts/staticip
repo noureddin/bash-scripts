@@ -41,15 +41,14 @@ else
     elif [ "${line:0:2}" != "# " ] && [ $d -eq 1 ] ; then
       d=2
       echo "
-      auto lo $iface
-      iface lo inet loopback
-      iface $iface inet static
-      address $iaddr
-      netmask $mask
-      gateway $gateway
-      network $network
-      broadcast $bcast
-      " >> /etc/network/interfaces
+  auto lo $iface
+  iface lo inet loopback
+  iface $iface inet static
+  address $iaddr
+  netmask $mask
+  gateway $gateway
+  network $network
+  broadcast $bcast" >> /etc/network/interfaces
     elif [ "${line:0:2}" == "# " ] && [ $d -eq 2 ] ; then
       d=3
       echo $line >> /etc/network/interfaces
