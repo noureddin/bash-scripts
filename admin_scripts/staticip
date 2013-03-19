@@ -57,4 +57,5 @@ else
     fi
   done
   /etc/init.d/networking restart
+  echo "Mission Done!"
 fi
