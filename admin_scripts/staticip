@@ -1,5 +1,5 @@
 #!/bin/bash
-# make a static ip
+# this script makes the ip static
 # Resources:
 #  http://serverfault.com/questions/31170/how-to-find-the-gateway-ip-address-in-linux
 #  http://www.cyberciti.biz/faq/linux-configure-a-static-ip-address-tutorial/
