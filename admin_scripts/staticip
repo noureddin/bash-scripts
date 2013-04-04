@@ -1,4 +1,7 @@
 #!/bin/bash
+# Modified Version!!
+# Get The Original at:
+#  https://raw.github.com/noureddin/bash-scripts/master/admin_scripts/staticip
 # this script makes the ip static
 # Resources:
 #  http://serverfault.com/questions/31170/how-to-find-the-gateway-ip-address-in-linux

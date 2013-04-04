@@ -1,7 +1,7 @@
 #!/bin/bash
 # Converting .grx files (getright list file) to a wget script ;)
 # Usage: grx2wget /path/to/file.grx
-# Before Using: correct the file encoding (if non-latin) and line ending (to linux, "LF")
+# Before Using: correct the file encoding (if non-latin) and line ending (to unix, "LF")
 # How to work:
 #  make a temp file to work on
 #  read every line in the original grx file
@@ -10,7 +10,9 @@
 #  but make C:, D:, .. to /home/user and change every \ to /
 #  remove temp file
 #  make directories
-
+# You may test it: http://way2allah.com/khotab-series-638.htm
+# You may take a look at this *_^ :
+#   http://www.linuxac.org/forum/threads/63002-%D9%85%D8%AD%D9%88%D9%84-grx-%D9%84%D8%AA%D8%AD%D9%88%D9%8A%D9%84-%D9%85%D9%84%D9%81%D8%A7%D8%AA-getright-%D8%A5%D9%84%D9%89-wget
 sed 's|\\|\\\\|g' "$@" > /tmp/tempfile.grx
 
 cat /tmp/tempfile.grx | while read line
@@ -41,6 +43,9 @@ done				# put the 'mkdir' lines
 echo >> "${@}.sh"		# put an empty line
 
 cat /tmp/tempwgetfile >> "${@}.sh" # put the 'wget $URL' lines
+
+chmod +x "${@}.sh" # make it executable
+# Note; Because of using "${@}.sh", the produced shell is written in the same directory of the grx file
 
 rm /tmp/tempwgetfile
 rm /tmp/tempfile.grx

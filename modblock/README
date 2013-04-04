@@ -1,6 +1,7 @@
 README for modblock
 
-NOTE: New Edition, Still under Develepement
+NOTE: This is an Alpha Edition, get the last stable from:
+  https://github.com/noureddin/bash-scripts/tree/899199fdb3a1186056bd5a432a85ccb431d6e96a/modblock
 
  Kernel Module Blocker for Unix-like systems (Still Under Testing)
   You can use this script to block any kernel module.

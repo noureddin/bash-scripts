@@ -2,6 +2,7 @@
 
 # Shutdown, Restart, Suspend, or Hibernate the computer, and more, without sudo!
 # Forked from https://gist.github.com/988104 to support delaying and more :)
+# You may take a look at: https://github.com/noureddin/easy-shutdown
 
 usage() {
     echo "

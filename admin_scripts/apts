@@ -1,4 +1,6 @@
 #!/bin/bash
+# APTS: one tool to use apt-get, apt-cache, dpkg and dselect
+# Notice that APTS is still ALPHA
 
 # apts install package = apt-get install package
 # apts remove package = apt-get remove package
@@ -8,11 +10,16 @@
 # apts rm oldkernels = special_script
 # apts purge removed = apt-get install package
 # apts edit = nano /etc/apt/sources.list
-# apts install package = apt-get install package
+# apts search package = apt-cache search package
+# apts find file = dpkg --search file
+# apts setup package.deb = dpkg --install package.deb
 
 case "$1" in
 "install"|"update"|"upgrade"|"dist-upgrade"|"download"|"remove"|"autoremove"|"purge"|"clean"|"autoclean")
   apt-get $@
+;;
+"autopurge")
+  apt-get autoremove --purge
 ;;
 "rm")
   case "$2" in
@@ -23,6 +30,8 @@ case "$1" in
     grep -v `uname -r` |
     while read kern ; do
       apt-get remove $kern -y ; done
+    # another way from linuxac.org
+    # dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
   ;;
   "orphan")
     apt-get purge `deborphan` -y
@@ -38,19 +47,16 @@ case "$1" in
 "show"|"search")
   apt-cache $@
 ;;
-"install")
-
+"find")
+  dpkg --search ${@:2}
 ;;
-"install")
-
+"setup")
+  dpkg --install ${@:2}
 ;;
-"install")
-
+"add")
+  add-apt-repository ${@:2}
 ;;
-"install")
-
-;;
-"install")
-
+"rem")
+  add-apt-repository -r ${@:2}
 ;;
 esac
