@@ -13,6 +13,8 @@
 # apts search package = apt-cache search package
 # apts find file = dpkg --search file
 # apts setup package.deb = dpkg --install package.deb
+# apts list package = dpkg -L package
+# apts edit => editor sources.list (or) sources.list.d/$$-$$.list
 
 case "$1" in
 "install"|"update"|"upgrade"|"dist-upgrade"|"download"|"remove"|"autoremove"|"purge"|"clean"|"autoclean")
@@ -42,7 +44,12 @@ case "$1" in
 ;;
 
 "edit")
-  nano /etc/apt/sources.list
+  # editor refers to `nano` or `vim`, as configured using `update-alternatives`
+  if [ -z "$2" ] ; then
+    editor /etc/apt/sources.list
+  else
+    editor /etc/apt/sources.list.d/$2-$3*.list
+  fi
 ;;
 "show"|"search")
   apt-cache $@
@@ -58,5 +65,8 @@ case "$1" in
 ;;
 "rem")
   add-apt-repository -r ${@:2}
+;;
+"list")
+  dpkg -L ${@:2}
 ;;
 esac

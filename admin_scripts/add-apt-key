@@ -1,7 +1,7 @@
 #!/bin/bash
 # FROM: http://blog.anantshri.info/howto-add-ppa-in-debian/
 # Modified to add GPG Keys only, you may look at 'add-apt-ppa'
-# at https://github.com/noureddin/bash-scripts/tree/master/small_scripts
+# at https://github.com/noureddin/bash-scripts/tree/master/admin_scripts
 
 NM=`uname -a && date`
 NAME=`echo $NM | md5sum | cut -f1 -d" "`

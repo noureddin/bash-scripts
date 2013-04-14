@@ -1,0 +1,44 @@
+#!/bin/bash
+# an easy tool to make some users not asked for their password when log in (now, mdm only)
+
+case "$1" in
+  "status")
+    [ -n "`grep /etc/nopassusers /etc/pam.d/mdm`" ] && (echo Activated ; cat /etc/nopassusers 2>/dev/null | sed 's/^./  &/g' ) || (echo Deactivated ; echo ; cat /etc/nopassusers 2>/dev/null | sed 's/^./  &/g')
+  ;;
+  "activate")
+    [ -n "`grep /etc/nopassusers /etc/pam.d/mdm`" ] && echo Already activated || ( # deactivated
+    sed 's|@include common-auth|auth sufficient pam_listfile.so item=user sense=allow file=/etc/nopassusers onerr=fail\n@include common-auth|' /etc/pam.d/mdm > /etc/pam.d/mdm.tmp
+    mv /etc/pam.d/mdm.tmp /etc/pam.d/mdm
+    touch /etc/nopassusers
+    echo 'Activated!'
+    )
+  ;;
+  "deactivate")
+    [ -n "`grep /etc/nopassusers /etc/pam.d/mdm`" ] && ( # activated
+    sed 's|auth sufficient pam_listfile.so item=user sense=allow file=/etc/nopassusers onerr=fail||' /etc/pam.d/mdm | grep -v ^$ > /etc/pam.d/mdm.tmp
+    mv /etc/pam.d/mdm.tmp /etc/pam.d/mdm
+    echo 'Deactivated!'
+    ) || echo Already deactivated
+  ;;
+  "add")
+    for u in "${@:2}"
+    do
+      echo $u >> /etc/nopassusers
+    done
+    echo "${@:2} added"
+  ;;
+  "remove")
+    > /etc/nopassusers.tmp
+    cat /etc/nopassusers | while read u
+    do
+      case ${@:2} in  *"$u"*) ;; *)
+        echo "$u" >> /etc/nopassusers.tmp
+      ;; esac
+    done
+    mv /etc/nopassusers.tmp /etc/nopassusers
+    echo "${@:2} removed"
+  ;;
+  *)
+    # help
+  ;;
+esac

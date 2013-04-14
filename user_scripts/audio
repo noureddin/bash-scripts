@@ -1,0 +1,30 @@
+#!/bin/bash
+# Pronounce words via google translate service ;)
+# from commandlinefu.com
+# Usage: ./audio en text
+
+# multiline problem!
+
+mplayer "http://translate.google.com/translate_tts?tl=$1&q=${@:2}" |:
+exit # ignore what's coming
+
+audio(){
+  if [ "$1" == "-i" ]
+  then
+    cat ${@:2}
+  else
+    echo $@
+ fi | while read line
+  do
+#    word=${line// //+}
+#    echo $line
+    file="/tmp/output.mp3"
+    wget -q -U Mozilla -O $file "http://translate.google.com/translate_tts?ie=UTF-8&tl=ar&q=$line"
+    mplayer $file &>/dev/null
+    rm $file
+  done
+}
+
+audio $@
+
+mplayer "http://translate.google.com/translate_tts?tl=$1&q=${@:2}" &>/dev/null

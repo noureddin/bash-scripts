@@ -1,6 +1,6 @@
 #!/bin/bash
 
-hb=0 #helpboolean , to prevent printing help more than one time
+hb=0 # helpboolean , to prevent printing help more than one time
 function echohelp {
 	if [ $hb -eq 0 ]
 	then
@@ -26,8 +26,8 @@ function echohelp {
 	fi
 }
 
-blst='/etc/modprobe.d/modblock.conf' #blacklist file
-touch $blst #to stop errors if not found ;)
+blst='/etc/modprobe.d/modblock.list' # blacklist file
+touch $blst # to avoid errors if not found ;)
 
 function if_compact { # if the first parameter is "compact" then echo if with spaces not lines
         if [ "$1" == "compact" ] ; then
